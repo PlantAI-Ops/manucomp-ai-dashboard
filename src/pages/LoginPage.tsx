@@ -92,7 +92,7 @@ const LoginPage = () => {
         <Button
           type="submit"
           disabled={!canSubmit}
-          className="w-full bg-gradient-to-r from-primary to-blue-600 hover:opacity-90 transition-opacity rounded-input active:scale-[0.98]"
+          className="w-full bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity rounded-input active:scale-[0.98]"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
         </Button>
