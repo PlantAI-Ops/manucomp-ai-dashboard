@@ -309,7 +309,7 @@ const EmployeesPage = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
-                          <StatusDot status={emp.is_active ? "success" : "danger"} />
+                          <StatusDot variant={emp.is_active ? "success" : "danger"} />
                           <span className="text-xs">{emp.is_active ? "Active" : "Inactive"}</span>
                         </div>
                       </td>
