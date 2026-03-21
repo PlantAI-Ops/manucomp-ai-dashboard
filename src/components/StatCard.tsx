@@ -31,7 +31,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
         )}
       >
         <div className="flex items-start justify-between">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary", iconClassName)}>
             {icon}
           </div>
           {trend && TrendIcon && (
