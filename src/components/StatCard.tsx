@@ -18,7 +18,7 @@ const trendConfig = {
 };
 
 export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
-  ({ icon, label, value, trend, className }, ref) => {
+  ({ icon, label, value, trend, iconClassName, className }, ref) => {
     const TrendIcon = trend ? trendConfig[trend.direction].icon : null;
     const trendColor = trend ? trendConfig[trend.direction].color : "";
 
