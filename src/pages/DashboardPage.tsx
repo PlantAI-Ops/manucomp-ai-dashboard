@@ -50,7 +50,7 @@ const DashboardPage = () => {
             icon={<Briefcase className="h-5 w-5" />}
             label="Total Roles"
             value={isLoading ? "—" : summary.total_roles}
-            className="[&_.stat-icon]:text-secondary"
+            iconClassName="bg-secondary/10 text-secondary"
           />
         </div>
         <div className="animate-in-up stagger-3">
@@ -58,7 +58,7 @@ const DashboardPage = () => {
             icon={<Award className="h-5 w-5" />}
             label="Total Competencies"
             value={isLoading ? "—" : summary.total_competencies}
-            className="[&_.stat-icon]:text-purple-400"
+            iconClassName="bg-purple/10 text-purple"
           />
         </div>
         <div className="animate-in-up stagger-4">
@@ -66,7 +66,7 @@ const DashboardPage = () => {
             icon={<ClipboardCheck className="h-5 w-5" />}
             label="Assessment Coverage"
             value={isLoading ? "—" : `${summary.assessment_percentage.toFixed(1)}%`}
-            className="[&_.stat-icon]:text-success"
+            iconClassName="bg-success/10 text-success"
           />
         </div>
       </div>
