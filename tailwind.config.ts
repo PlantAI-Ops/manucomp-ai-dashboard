@@ -73,6 +73,7 @@ export default {
           foreground: "hsl(var(--info-foreground))",
         },
         "primary-end": "hsl(var(--primary-end))",
+        purple: "hsl(var(--purple))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

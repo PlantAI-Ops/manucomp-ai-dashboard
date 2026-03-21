@@ -7,6 +7,7 @@ interface StatCardProps {
   label: string;
   value: string | number;
   trend?: { direction: "up" | "down" | "neutral"; value: string };
+  iconClassName?: string;
   className?: string;
 }
 
@@ -17,7 +18,7 @@ const trendConfig = {
 };
 
 export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
-  ({ icon, label, value, trend, className }, ref) => {
+  ({ icon, label, value, trend, iconClassName, className }, ref) => {
     const TrendIcon = trend ? trendConfig[trend.direction].icon : null;
     const trendColor = trend ? trendConfig[trend.direction].color : "";
 
@@ -30,7 +31,7 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
         )}
       >
         <div className="flex items-start justify-between">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary", iconClassName)}>
             {icon}
           </div>
           {trend && TrendIcon && (
