@@ -7,6 +7,7 @@ interface StatCardProps {
   label: string;
   value: string | number;
   trend?: { direction: "up" | "down" | "neutral"; value: string };
+  iconClassName?: string;
   className?: string;
 }
 
