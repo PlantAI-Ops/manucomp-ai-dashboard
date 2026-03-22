@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { StatusDot } from "@/components/StatusDot";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { EmployeeFormModal } from "@/components/employees/EmployeeFormModal";
 import {
   Select,
   SelectContent,
@@ -29,6 +31,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import api from "@/services/api";
 import {
   useEmployees,
   useRoles,
@@ -45,6 +50,7 @@ type StatusFilter = "all" | "active" | "inactive";
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 const EmployeesPage = () => {
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
@@ -53,6 +59,12 @@ const EmployeesPage = () => {
   const [pageSize, setPageSize] = useState(20);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+
+  // Modal state
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<EmployeeListItem | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<EmployeeListItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const filters: EmployeeFilters = {
     page,
@@ -64,12 +76,11 @@ const EmployeesPage = () => {
   };
 
   const { data: apiData, isLoading, isError } = useEmployees(filters);
-  const { data: apiRoles, isError: rolesError } = useRoles();
+  const { data: apiRoles } = useRoles();
 
   const useMock = isError || !apiData;
   const roles = apiRoles ?? MOCK_ROLES;
 
-  // For mock data, do client-side filtering/pagination
   const mockFiltered = useMemo(() => {
     if (!useMock) return [];
     let result = [...MOCK_EMPLOYEES];
@@ -82,15 +93,9 @@ const EmployeesPage = () => {
           e.email.toLowerCase().includes(q)
       );
     }
-    if (departmentFilter !== "all") {
-      result = result.filter((e) => e.department === departmentFilter);
-    }
-    if (roleFilter !== "all") {
-      result = result.filter((e) => e.role_id === roleFilter);
-    }
-    if (statusFilter !== "all") {
-      result = result.filter((e) => (statusFilter === "active" ? e.is_active : !e.is_active));
-    }
+    if (departmentFilter !== "all") result = result.filter((e) => e.department === departmentFilter);
+    if (roleFilter !== "all") result = result.filter((e) => e.role_id === roleFilter);
+    if (statusFilter !== "all") result = result.filter((e) => (statusFilter === "active" ? e.is_active : !e.is_active));
     return result;
   }, [useMock, search, departmentFilter, roleFilter, statusFilter]);
 
@@ -104,10 +109,7 @@ const EmployeesPage = () => {
     });
   }, [mockFiltered, sortKey, sortDir, useMock]);
 
-  const employees = useMock
-    ? sortedMock.slice((page - 1) * pageSize, page * pageSize)
-    : apiData.items;
-
+  const employees = useMock ? sortedMock.slice((page - 1) * pageSize, page * pageSize) : apiData.items;
   const total = useMock ? sortedMock.length : apiData.total;
   const totalPages = Math.ceil(total / pageSize);
 
@@ -129,12 +131,8 @@ const EmployeesPage = () => {
   };
 
   const toggleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir("asc"); }
     setPage(1);
   };
 
@@ -144,12 +142,25 @@ const EmployeesPage = () => {
   };
 
   const getInitials = (name: string) =>
-    name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
+    name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+
+  const openCreate = () => { setEditingEmployee(null); setFormOpen(true); };
+  const openEdit = (emp: EmployeeListItem) => { setEditingEmployee(emp); setFormOpen(true); };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/employees/${deleteTarget.id}`);
+      toast.success(`${deleteTarget.full_name} deleted`);
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+    } catch {
+      toast.error("Failed to delete employee");
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
+  };
 
   const startItem = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const endItem = Math.min(page * pageSize, total);
@@ -171,7 +182,7 @@ const EmployeesPage = () => {
         title="Employees"
         subtitle="Manage manufacturing personnel"
         actions={
-          <Button size="sm">
+          <Button size="sm" onClick={openCreate}>
             <Plus className="mr-1 h-4 w-4" />
             Add Employee
           </Button>
@@ -190,31 +201,24 @@ const EmployeesPage = () => {
               className="pl-9 bg-muted/50 border-border/50 rounded-input"
             />
           </div>
-
           <Select value={departmentFilter} onValueChange={(v) => { setDepartmentFilter(v); setPage(1); }}>
             <SelectTrigger className="w-[160px] bg-muted/50 border-border/50 rounded-input">
               <SelectValue placeholder="Department" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Departments</SelectItem>
-              {departments.map((d) => (
-                <SelectItem key={d} value={d}>{d}</SelectItem>
-              ))}
+              {departments.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
             </SelectContent>
           </Select>
-
           <Select value={roleFilter} onValueChange={(v) => { setRoleFilter(v); setPage(1); }}>
             <SelectTrigger className="w-[160px] bg-muted/50 border-border/50 rounded-input">
               <SelectValue placeholder="Role" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Roles</SelectItem>
-              {roles.map((r) => (
-                <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
-              ))}
+              {roles.map((r) => <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>)}
             </SelectContent>
           </Select>
-
           <div className="flex items-center rounded-input border border-border/50 bg-muted/50 overflow-hidden">
             {(["all", "active", "inactive"] as StatusFilter[]).map((s) => (
               <button
@@ -222,16 +226,13 @@ const EmployeesPage = () => {
                 onClick={() => { setStatusFilter(s); setPage(1); }}
                 className={cn(
                   "px-3 py-2 text-xs font-medium capitalize transition-colors",
-                  statusFilter === s
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                  statusFilter === s ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {s}
               </button>
             ))}
           </div>
-
           {hasFilters && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-muted-foreground">
               <X className="mr-1 h-3 w-3" /> Clear
@@ -243,9 +244,7 @@ const EmployeesPage = () => {
         {isLoading ? (
           <div className="p-4 space-y-3">
             <Skeleton className="h-9 w-64 bg-muted" />
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full bg-muted" />
-            ))}
+            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-12 w-full bg-muted" />)}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -284,10 +283,7 @@ const EmployeesPage = () => {
                   </tr>
                 ) : (
                   employees.map((emp) => (
-                    <tr
-                      key={emp.id}
-                      className="border-b border-border/30 last:border-0 hover:bg-muted/30 transition-colors duration-100"
-                    >
+                    <tr key={emp.id} className="border-b border-border/30 last:border-0 hover:bg-muted/30 transition-colors duration-100">
                       <td className="px-4 py-3 font-mono text-xs">{emp.employee_number}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
@@ -298,15 +294,9 @@ const EmployeesPage = () => {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">{emp.email}</td>
-                      <td className="px-4 py-3">
-                        <StatusBadge variant="info">{emp.role_name ?? emp.role_id}</StatusBadge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <StatusBadge variant="neutral">{emp.department}</StatusBadge>
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground tabular-nums">
-                        {format(new Date(emp.hire_date), "MMM d, yyyy")}
-                      </td>
+                      <td className="px-4 py-3"><StatusBadge variant="info">{emp.role_name ?? emp.role_id}</StatusBadge></td>
+                      <td className="px-4 py-3"><StatusBadge variant="neutral">{emp.department}</StatusBadge></td>
+                      <td className="px-4 py-3 text-muted-foreground tabular-nums">{format(new Date(emp.hire_date), "MMM d, yyyy")}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
                           <StatusDot variant={emp.is_active ? "success" : "danger"} />
@@ -315,13 +305,11 @@ const EmployeesPage = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="icon" className="h-7 w-7">
-                            <Eye className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                          <Button variant="ghost" size="icon" className="h-7 w-7"><Eye className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(emp)}>
                             <Pencil className="h-3.5 w-3.5" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeleteTarget(emp)}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
@@ -337,27 +325,19 @@ const EmployeesPage = () => {
         {/* Pagination */}
         {total > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/50 px-4 py-3">
-            <span className="text-xs text-muted-foreground">
-              Showing {startItem}–{endItem} of {total}
-            </span>
+            <span className="text-xs text-muted-foreground">Showing {startItem}–{endItem} of {total}</span>
             <div className="flex items-center gap-3">
               <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setPage(1); }}>
-                <SelectTrigger className="w-[80px] h-8 text-xs bg-muted/50 border-border/50 rounded-input">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger className="w-[80px] h-8 text-xs bg-muted/50 border-border/50 rounded-input"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {PAGE_SIZE_OPTIONS.map((s) => (
-                    <SelectItem key={s} value={String(s)}>{s} / page</SelectItem>
-                  ))}
+                  {PAGE_SIZE_OPTIONS.map((s) => <SelectItem key={s} value={String(s)}>{s} / page</SelectItem>)}
                 </SelectContent>
               </Select>
               <div className="flex items-center gap-1">
                 <Button variant="ghost" size="icon" className="h-8 w-8" disabled={page <= 1} onClick={() => setPage(page - 1)}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="px-2 text-xs tabular-nums text-muted-foreground">
-                  {page} / {totalPages}
-                </span>
+                <span className="px-2 text-xs tabular-nums text-muted-foreground">{page} / {totalPages}</span>
                 <Button variant="ghost" size="icon" className="h-8 w-8" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -366,6 +346,21 @@ const EmployeesPage = () => {
           </div>
         )}
       </div>
+
+      {/* Create/Edit Modal */}
+      <EmployeeFormModal open={formOpen} onOpenChange={setFormOpen} employee={editingEmployee} />
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Employee"
+        description={`Are you sure you want to delete ${deleteTarget?.full_name}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        variant="destructive"
+        loading={deleting}
+        onConfirm={handleDelete}
+      />
     </AppLayout>
   );
 };
