@@ -52,6 +52,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 const EmployeesPage = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
