@@ -44,6 +44,7 @@ import {
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 const RolesPage = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
