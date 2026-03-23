@@ -228,11 +228,12 @@ const RoleDetailPage = () => {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 min-w-[120px]">
-                          <Progress
-                            value={readiness}
-                            className="h-1.5 flex-1"
-                            indicatorClassName={readinessColor(readiness)}
-                          />
+                          <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
+                            <div
+                              className={cn("h-full rounded-full transition-all", readinessColor(readiness))}
+                              style={{ width: `${readiness}%` }}
+                            />
+                          </div>
                           <span className="text-xs tabular-nums text-muted-foreground w-8 text-right">{readiness}%</span>
                         </div>
                       </td>
