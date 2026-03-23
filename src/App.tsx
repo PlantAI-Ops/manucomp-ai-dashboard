@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import EmployeeDetailPage from "./pages/EmployeeDetailPage";
+import RolesPage from "./pages/RolesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
