@@ -10,6 +10,7 @@ import RegisterPage from "./pages/RegisterPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import EmployeeDetailPage from "./pages/EmployeeDetailPage";
 import RolesPage from "./pages/RolesPage";
+import RoleDetailPage from "./pages/RoleDetailPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

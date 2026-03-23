@@ -10,7 +10,7 @@ import { LevelIndicator } from "@/components/LevelIndicator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { RoleFormModal } from "@/components/roles/RoleFormModal";
-import { Progress } from "@/components/ui/progress";
+
 import { Pencil, Trash2, Check, X, Briefcase, Users } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
