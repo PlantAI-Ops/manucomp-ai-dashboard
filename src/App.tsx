@@ -28,6 +28,7 @@ const App = () => (
             <Route path="/employees" element={<EmployeesPage />} />
             <Route path="/employees/:id" element={<EmployeeDetailPage />} />
             <Route path="/roles" element={<RolesPage />} />
+            <Route path="/roles/:id" element={<RoleDetailPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="*" element={<NotFound />} />
