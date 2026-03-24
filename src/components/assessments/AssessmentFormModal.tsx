@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import api from "@/services/api";
 import type { AssessmentListItem } from "@/services/assessments";
 import { MOCK_EMPLOYEES, type EmployeeListItem } from "@/services/employees";
-import { MOCK_COMPETENCIES, type CompetencyListItem } from "@/services/competencies";
+import { MOCK_COMPETENCIES, type CompetencyItem } from "@/services/competencies";
 
 const LEVEL_DESCRIPTIONS: Record<number, string> = {
   0: "No Knowledge",
