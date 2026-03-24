@@ -263,10 +263,9 @@ export default function AssessmentsPage() {
                       </TableCell>
                       <TableCell className="text-muted-foreground">{a.assessor_name}</TableCell>
                       <TableCell>
-                        <StatusBadge
-                          status={a.assessor_type}
-                          variant={ASSESSOR_TYPE_VARIANTS[a.assessor_type] || "neutral"}
-                        />
+                        <StatusBadge variant={ASSESSOR_TYPE_VARIANTS[a.assessor_type] || "neutral"}>
+                          {a.assessor_type.charAt(0).toUpperCase() + a.assessor_type.slice(1)}
+                        </StatusBadge>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {format(new Date(a.assessed_at), "MMM d, yyyy")}
