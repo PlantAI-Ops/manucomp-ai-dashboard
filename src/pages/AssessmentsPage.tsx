@@ -265,7 +265,7 @@ export default function AssessmentsPage() {
                       <TableCell>
                         <StatusBadge
                           status={a.assessor_type}
-                          variant={ASSESSOR_TYPE_COLORS[a.assessor_type] || "default"}
+                          variant={ASSESSOR_TYPE_VARIANTS[a.assessor_type] || "neutral"}
                         />
                       </TableCell>
                       <TableCell className="text-muted-foreground">
