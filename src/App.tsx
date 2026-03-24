@@ -12,6 +12,7 @@ import EmployeeDetailPage from "./pages/EmployeeDetailPage";
 import RolesPage from "./pages/RolesPage";
 import RoleDetailPage from "./pages/RoleDetailPage";
 import CompetenciesPage from "./pages/CompetenciesPage";
+import AssessmentsPage from "./pages/AssessmentsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
