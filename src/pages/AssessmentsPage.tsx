@@ -51,7 +51,7 @@ import {
   type AssessmentFilters,
 } from "@/services/assessments";
 import { MOCK_EMPLOYEES } from "@/services/employees";
-import { MOCK_COMPETENCIES } from "@/services/competencies";
+import { MOCK_COMPETENCIES, type CompetencyItem } from "@/services/competencies";
 
 const ASSESSOR_TYPE_COLORS: Record<string, "blue" | "green" | "purple" | "default"> = {
   self: "blue",

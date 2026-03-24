@@ -61,7 +61,7 @@ export function AssessmentFormModal({ open, onOpenChange, assessment, onSuccess 
   const [saving, setSaving] = useState(false);
 
   const [employees, setEmployees] = useState<EmployeeListItem[]>([]);
-  const [competencies, setCompetencies] = useState<CompetencyListItem[]>([]);
+  const [competencies, setCompetencies] = useState<CompetencyItem[]>([]);
 
   useEffect(() => {
     if (!open) return;

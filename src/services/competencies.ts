@@ -33,7 +33,7 @@ export interface CompetencyFormData {
 
 // ── Mock data ──
 
-const MOCK_COMPETENCIES: CompetencyItem[] = [
+export const MOCK_COMPETENCIES: CompetencyItem[] = [
   { id: "c1", name: "CNC Machine Operation", description: "Ability to set up and operate CNC milling and turning machines", category: "technical", is_safety_critical: true, detailed_description: null, best_practices: null, common_mistakes: null, created_at: "2024-01-10T08:00:00Z" },
   { id: "c2", name: "Quality Inspection", description: "Perform dimensional and visual quality checks using precision instruments", category: "technical", is_safety_critical: false, detailed_description: null, best_practices: null, common_mistakes: null, created_at: "2024-01-12T08:00:00Z" },
   { id: "c3", name: "Lockout/Tagout Procedures", description: "Safely de-energize and isolate equipment for maintenance", category: "safety", is_safety_critical: true, detailed_description: null, best_practices: null, common_mistakes: null, created_at: "2024-01-15T08:00:00Z" },
