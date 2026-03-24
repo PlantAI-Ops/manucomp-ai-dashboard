@@ -11,6 +11,7 @@ import EmployeesPage from "./pages/EmployeesPage";
 import EmployeeDetailPage from "./pages/EmployeeDetailPage";
 import RolesPage from "./pages/RolesPage";
 import RoleDetailPage from "./pages/RoleDetailPage";
+import CompetenciesPage from "./pages/CompetenciesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/employees/:id" element={<EmployeeDetailPage />} />
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/roles/:id" element={<RoleDetailPage />} />
+            <Route path="/competencies" element={<CompetenciesPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="*" element={<NotFound />} />
