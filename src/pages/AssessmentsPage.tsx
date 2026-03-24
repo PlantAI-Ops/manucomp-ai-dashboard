@@ -53,11 +53,11 @@ import {
 import { MOCK_EMPLOYEES } from "@/services/employees";
 import { MOCK_COMPETENCIES, type CompetencyItem } from "@/services/competencies";
 
-const ASSESSOR_TYPE_COLORS: Record<string, "blue" | "green" | "purple" | "default"> = {
-  self: "blue",
-  supervisor: "green",
-  peer: "purple",
-  external: "default",
+const ASSESSOR_TYPE_VARIANTS: Record<string, "info" | "success" | "neutral" | "warning" | "danger"> = {
+  self: "info",
+  supervisor: "success",
+  peer: "warning",
+  external: "neutral",
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
