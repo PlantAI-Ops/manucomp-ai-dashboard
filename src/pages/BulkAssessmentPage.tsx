@@ -201,7 +201,7 @@ export default function BulkAssessmentPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <StatusBadge status={row.category} size="sm" />
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground capitalize">{row.category}</span>
                       </TableCell>
                       <TableCell className="text-center">
                         <LevelIndicator level={row.required_level} size="sm" />

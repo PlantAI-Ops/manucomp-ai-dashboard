@@ -140,7 +140,7 @@ function GapAnalysisTab() {
                   return (
                     <TableRow key={g.competency_id}>
                       <TableCell className="font-medium">{g.competency_name}</TableCell>
-                      <TableCell><StatusBadge status={g.category} size="sm" /></TableCell>
+                      <TableCell><span className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground capitalize">{g.category}</span></TableCell>
                       <TableCell className="text-center">
                         {g.is_safety_critical ? <AlertTriangle className="h-4 w-4 text-warning mx-auto" /> : "—"}
                       </TableCell>
