@@ -35,6 +35,8 @@ const App = () => (
             <Route path="/roles/:id" element={<RoleDetailPage />} />
             <Route path="/competencies" element={<CompetenciesPage />} />
             <Route path="/assessments" element={<AssessmentsPage />} />
+            <Route path="/assessments/bulk" element={<BulkAssessmentPage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="*" element={<NotFound />} />
