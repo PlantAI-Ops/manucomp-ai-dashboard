@@ -15,9 +15,9 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { MOCK_EMPLOYEES, type EmployeeListItem } from "@/services/employees";
-import { MOCK_ROLES, type CompetencyRequirement } from "@/services/roles";
-import { MOCK_ASSESSMENTS, type CreateAssessmentPayload } from "@/services/assessments";
-import { Send, User, AlertTriangle, CheckCircle } from "lucide-react";
+import { MOCK_ROLES } from "@/services/roles";
+import { MOCK_ASSESSMENTS } from "@/services/assessments";
+import { Send, User, AlertTriangle } from "lucide-react";
 import api from "@/services/api";
 
 interface AssessmentRow {
