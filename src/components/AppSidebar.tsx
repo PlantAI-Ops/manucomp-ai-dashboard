@@ -40,7 +40,7 @@ const navItems: NavItem[] = [
   { title: "Roles", url: "/roles", icon: Briefcase },
   { title: "Competencies", url: "/competencies", icon: Award },
   { title: "Assessments", url: "/assessments", icon: ClipboardCheck },
-  { title: "Analytics", url: "/analytics", icon: BarChart3, roles: ["admin", "manager"] },
+  { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "AI Assistant", url: "/ai", icon: Sparkles, roles: ["admin", "manager"] },
   { title: "Settings", url: "/settings", icon: Settings, roles: ["admin"] },
 ];
