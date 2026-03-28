@@ -91,7 +91,7 @@ const SettingsPage: React.FC = () => {
                         className="max-w-xs"
                       />
                       <Button size="icon" variant="ghost" onClick={handleSaveName}>
-                        <Check className="h-4 w-4 text-green-600" />
+                        <Check className="h-4 w-4 text-primary" />
                       </Button>
                       <Button size="icon" variant="ghost" onClick={() => { setEditingName(false); setFullName(user?.full_name || ""); }}>
                         <X className="h-4 w-4 text-destructive" />
