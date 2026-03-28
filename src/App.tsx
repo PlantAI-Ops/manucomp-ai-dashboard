@@ -15,6 +15,7 @@ import CompetenciesPage from "./pages/CompetenciesPage";
 import AssessmentsPage from "./pages/AssessmentsPage";
 import BulkAssessmentPage from "./pages/BulkAssessmentPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
