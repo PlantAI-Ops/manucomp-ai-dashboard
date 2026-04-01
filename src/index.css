@@ -96,6 +96,35 @@
   .stagger-3 { animation-delay: 180ms; }
   .stagger-4 { animation-delay: 240ms; }
   .stagger-5 { animation-delay: 300ms; }
+
+  /* Page transition wrapper */
+  .page-transition {
+    animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Count-up number animation */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Mobile touch targets */
+  @media (max-width: 639px) {
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Hide on mobile, show on desktop */
+  .mobile-hidden {
+    @apply hidden sm:block;
+  }
+
+  /* Bottom nav for mobile */
+  .mobile-bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t bg-background/95 backdrop-blur-md px-2 py-1 sm:hidden;
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+  }
 }
 
 @keyframes fadeInUp {
