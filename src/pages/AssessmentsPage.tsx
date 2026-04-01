@@ -239,8 +239,25 @@ export default function AssessmentsPage() {
                 ))
               ) : pageItems.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
-                    No assessments found.
+                  <TableCell colSpan={8} className="h-48">
+                    <div className="flex flex-col items-center justify-center py-8 text-center animate-fade-in">
+                      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                        <ClipboardList className="h-6 w-6" />
+                      </div>
+                      <h3 className="text-base font-medium">
+                        {hasFilters ? "No assessments found" : "No assessments recorded"}
+                      </h3>
+                      <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                        {hasFilters
+                          ? "Try adjusting your filters"
+                          : "Start evaluating your team's skills."}
+                      </p>
+                      {!hasFilters && (
+                        <Button size="sm" className="mt-5" onClick={() => { setEditItem(null); setModalOpen(true); }}>
+                          <Plus className="mr-1 h-4 w-4" /> New Assessment
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (

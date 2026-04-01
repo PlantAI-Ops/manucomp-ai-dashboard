@@ -274,12 +274,23 @@ const EmployeesPage = () => {
                 {employees.length === 0 ? (
                   <tr>
                     <td colSpan={columns.length}>
-                      <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
                         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
                           <Users className="h-6 w-6" />
                         </div>
-                        <h3 className="text-base font-medium">No employees found</h3>
-                        <p className="mt-1 text-sm text-muted-foreground">Try adjusting your filters</p>
+                        <h3 className="text-base font-medium">
+                          {hasFilters ? "No employees found" : "No employees yet"}
+                        </h3>
+                        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                          {hasFilters
+                            ? "Try adjusting your filters"
+                            : "Add your first team member to get started."}
+                        </p>
+                        {!hasFilters && (
+                          <Button onClick={openCreate} size="sm" className="mt-5">
+                            <Plus className="mr-1 h-4 w-4" /> Add Employee
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>

@@ -173,7 +173,13 @@ const CompetenciesPage: React.FC = () => {
           {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-12 w-full bg-muted" />)}
         </div>
       ) : displayedItems.length === 0 ? (
-        <EmptyState title="No competencies found" description={hasFilters ? "Try adjusting your filters" : "Add your first competency to get started"} actionLabel={!hasFilters ? "Add Competency" : undefined} onAction={!hasFilters ? handleCreate : undefined} />
+        <EmptyState
+          icon={<Plus className="h-6 w-6" />}
+          title={hasFilters ? "No competencies found" : "No competencies in the system"}
+          description={hasFilters ? "Try adjusting your filters" : "Define your first competency to start tracking skills."}
+          actionLabel={!hasFilters ? "Add Competency" : undefined}
+          onAction={!hasFilters ? handleCreate : undefined}
+        />
       ) : viewMode === "table" ? (
         <div className="glass rounded-card overflow-hidden">
           <div className="overflow-x-auto">
