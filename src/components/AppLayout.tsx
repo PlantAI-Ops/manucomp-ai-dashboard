@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { useAuth } from "@/hooks/useAuth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,7 @@ const roleBadgeVariant = (role: string) => {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [search, setSearch] = useState("");
 
   const handleLogout = () => {
@@ -52,20 +54,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar />
+        {/* Sidebar hidden on mobile, visible on sm+ */}
+        <div className="hidden sm:block">
+          <AppSidebar />
+        </div>
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top bar */}
-          <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border/50 bg-background/80 backdrop-blur-md px-4">
+          <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center gap-2 sm:gap-4 border-b border-border/50 bg-background/80 backdrop-blur-md px-3 sm:px-4">
             {/* Left: sidebar trigger + app name */}
-            <div className="flex items-center gap-3">
-              <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors" />
-              <span className="hidden md:inline text-sm font-semibold text-foreground">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <SidebarTrigger className="hidden sm:flex text-muted-foreground hover:text-foreground transition-colors" />
+              <span className="text-sm font-semibold text-foreground">
                 ManuComp <span className="text-primary">AI</span>
               </span>
             </div>
 
-            {/* Center: search */}
-            <div className="flex-1 max-w-md mx-auto">
+            {/* Center: search — hidden on small mobile */}
+            <div className="flex-1 max-w-md mx-auto hidden sm:block">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -78,9 +83,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </div>
 
             {/* Right: notifications + user */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 ml-auto">
               {/* Notification bell */}
-              <button className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors active:scale-95">
+              <button className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors active:scale-95 touch-target">
                 <Bell className="h-4 w-4" />
                 <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive" />
               </button>
@@ -88,7 +93,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               {/* User dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-semibold hover:bg-primary/25 transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-semibold hover:bg-primary/25 transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-target">
                     {initials}
                   </button>
                 </DropdownMenuTrigger>
@@ -121,10 +126,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </div>
           </header>
 
-          <main className="flex-1 p-6 overflow-auto">
-            {children}
+          <main className="flex-1 p-3 sm:p-6 overflow-auto pb-20 sm:pb-6">
+            <div key={location.pathname} className="page-transition">
+              {children}
+            </div>
           </main>
         </div>
+
+        {/* Mobile bottom navigation */}
+        <MobileBottomNav />
       </div>
     </SidebarProvider>
   );
