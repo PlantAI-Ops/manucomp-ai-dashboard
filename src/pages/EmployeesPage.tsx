@@ -193,8 +193,8 @@ const EmployeesPage = () => {
 
       <div className="glass rounded-card overflow-hidden animate-fade-in">
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3 border-b border-border/50 p-4">
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 border-b border-border/50 p-3 sm:p-4">
+          <div className="relative flex-1 min-w-[160px] max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
