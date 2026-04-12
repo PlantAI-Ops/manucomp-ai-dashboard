@@ -23,8 +23,8 @@ import {
 import { toast } from "sonner";
 import api from "@/services/api";
 import type { AssessmentListItem } from "@/services/assessments";
-import { MOCK_EMPLOYEES, type EmployeeListItem } from "@/services/employees";
-import { MOCK_COMPETENCIES, type CompetencyItem } from "@/services/competencies";
+import { useEmployeesForSelect } from "@/services/employees";
+import { useCompetencyOptions } from "@/services/roles";
 
 const LEVEL_DESCRIPTIONS: Record<number, string> = {
   0: "No Knowledge",
@@ -60,19 +60,11 @@ export function AssessmentFormModal({ open, onOpenChange, assessment, onSuccess 
   const [evidence, setEvidence] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const [employees, setEmployees] = useState<EmployeeListItem[]>([]);
-  const [competencies, setCompetencies] = useState<CompetencyItem[]>([]);
+  const { data: employeesData } = useEmployeesForSelect();
+  const { data: competenciesData } = useCompetencyOptions();
 
-  useEffect(() => {
-    if (!open) return;
-    // Try API, fallback to mocks
-    api.get("/employees", { params: { page_size: 200 } })
-      .then(r => setEmployees(r.data.items))
-      .catch(() => setEmployees(MOCK_EMPLOYEES));
-    api.get("/competencies", { params: { page_size: 200 } })
-      .then(r => setCompetencies(r.data.items))
-      .catch(() => setCompetencies(MOCK_COMPETENCIES));
-  }, [open]);
+  const employees = employeesData ?? [];
+  const competencies = competenciesData ?? [];
 
   useEffect(() => {
     if (open && assessment) {
@@ -141,31 +133,51 @@ export function AssessmentFormModal({ open, onOpenChange, assessment, onSuccess 
           {/* Employee */}
           <div className="grid gap-1.5">
             <Label>Employee *</Label>
-            <Select value={employeeId} onValueChange={setEmployeeId} disabled={isEdit}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select employee" />
-              </SelectTrigger>
-              <SelectContent>
-                {employees.map(e => (
-                  <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isEdit ? (
+              <div className="flex items-center h-10 px-3 rounded-md border border-input bg-muted/50 text-sm">
+                {assessment?.employee_name || employeeId}
+              </div>
+            ) : (
+              <Select
+                value={employeeId || undefined}
+                onValueChange={setEmployeeId}
+                disabled={employees.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={employees.length === 0 ? "Loading..." : "Select employee"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {employees.map(e => (
+                    <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Competency */}
           <div className="grid gap-1.5">
             <Label>Competency *</Label>
-            <Select value={competencyId} onValueChange={setCompetencyId} disabled={isEdit}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select competency" />
-              </SelectTrigger>
-              <SelectContent>
-                {competencies.map(c => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isEdit ? (
+              <div className="flex items-center h-10 px-3 rounded-md border border-input bg-muted/50 text-sm">
+                {assessment?.competency_name || competencyId}
+              </div>
+            ) : (
+              <Select
+                value={competencyId || undefined}
+                onValueChange={setCompetencyId}
+                disabled={competencies.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={competencies.length === 0 ? "Loading..." : "Select competency"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {competencies.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Assessed Level */}

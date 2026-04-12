@@ -15,6 +15,7 @@ ManuComp AI is a comprehensive dashboard application designed for manufacturing 
 - **Assessment System** - Conduct and track employee competency assessments with history
 - **Bulk Assessments** - Perform assessments across multiple employees efficiently
 - **Analytics** - Visual insights and charts showing competency distribution and trends
+- **Audit Log** - Comprehensive system activity log tracking all changes and user actions (Admin only)
 - **AI Assistant** - GPT-powered insights for competency gaps and development recommendations
 - **Role-Based Access** - Secure access control with Admin, Manager, and Employee roles
 - **Responsive Design** - Fully responsive UI with sidebar navigation and mobile support
@@ -62,7 +63,7 @@ bun install
 
 3. Create a `.env` file in the root directory with your API endpoint:
 ```env
-VITE_API_URL=http://localhost:3000/api
+VITE_API_BASE_URL=http://localhost:8000/api/v1
 ```
 
 4. Start the development server:
@@ -111,6 +112,7 @@ src/
 │   ├── AssessmentsPage.tsx
 │   ├── BulkAssessmentPage.tsx
 │   ├── AnalyticsPage.tsx
+│   ├── AuditPage.tsx
 │   ├── SettingsPage.tsx
 │   ├── LoginPage.tsx
 │   └── RegisterPage.tsx
@@ -121,6 +123,7 @@ src/
 │   ├── competencies.ts    # Competency API calls
 │   ├── assessments.ts     # Assessment API calls
 │   ├── analytics.ts       # Analytics API calls
+│   ├── audit.ts           # Audit log API calls
 │   └── dashboard.ts       # Dashboard API calls
 ├── lib/
 │   └── utils.ts           # Utility functions
@@ -139,10 +142,10 @@ The application uses JWT-based authentication. Upon login, the API returns an ac
 
 ## API Configuration
 
-The API base URL is configured via the `VITE_API_URL` environment variable. API requests are handled through an Axios instance configured in `src/services/api.ts`.
+The API base URL is configured via the `VITE_API_BASE_URL` environment variable. API requests are handled through an Axios instance configured in `src/services/api.ts`.
 
 Default configuration:
-- Base URL: `http://localhost:3000/api`
+- Base URL: `http://localhost:8000/api/v1`
 - Timeout: Request timeout handling configured
 - Retry: Automatic retry for failed requests (except 501 errors)
 

@@ -14,9 +14,9 @@ import { EmptyState } from "@/components/EmptyState";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { MOCK_EMPLOYEES, type EmployeeListItem } from "@/services/employees";
-import { MOCK_ROLES } from "@/services/roles";
-import { MOCK_ASSESSMENTS } from "@/services/assessments";
+import { useEmployeesForSelect, useRoles } from "@/services/employees";
+import { useRoleDetail } from "@/services/roles";
+import { useEmployeeAssessments } from "@/services/assessments";
 import { Send, User, AlertTriangle } from "lucide-react";
 import api from "@/services/api";
 
@@ -46,33 +46,39 @@ export default function BulkAssessmentPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitProgress, setSubmitProgress] = useState(0);
 
-  const employees = MOCK_EMPLOYEES.filter((e) => e.is_active);
+  const { data: employeesData } = useEmployeesForSelect();
+  const employees = employeesData ?? [];
+  const { data: rolesData } = useRoles();
+  const roles = rolesData ?? [];
 
   const selectedEmployee = useMemo(
     () => employees.find((e) => e.id === selectedEmployeeId),
     [selectedEmployeeId, employees]
   );
 
+  const selectedRole = useMemo(
+    () => roles.find((r) => r.id === selectedEmployee?.role_id),
+    [roles, selectedEmployee]
+  );
+
+  const { data: assessmentsData } = useEmployeeAssessments(selectedEmployeeId);
+  const assessments = assessmentsData ?? [];
+
   useEffect(() => {
-    if (!selectedEmployee) {
-      setRows([]);
-      return;
-    }
-    const role = MOCK_ROLES.find((r) => r.id === selectedEmployee.role_id);
-    if (!role) {
+    if (!selectedRole) {
       setRows([]);
       return;
     }
 
-    const newRows: AssessmentRow[] = role.competency_requirements.map((req) => {
-      const latest = MOCK_ASSESSMENTS
-        .filter((a) => a.employee_id === selectedEmployee.id && a.competency_id === req.competency_id)
+    const newRows: AssessmentRow[] = selectedRole.competency_requirements.map((req) => {
+      const latest = assessments
+        .filter((a) => a.competency_id === req.competency_id)
         .sort((a, b) => new Date(b.assessed_at).getTime() - new Date(a.assessed_at).getTime())[0];
 
       return {
         competency_id: req.competency_id,
         competency_name: req.competency_name,
-        category: getCategoryFromId(req.competency_id),
+        category: req.category || "technical",
         required_level: req.required_level,
         current_level: latest ? latest.assessed_level : null,
         new_level: latest ? latest.assessed_level : 0,
@@ -80,17 +86,7 @@ export default function BulkAssessmentPage() {
       };
     });
     setRows(newRows);
-  }, [selectedEmployeeId]);
-
-  function getCategoryFromId(id: string): string {
-    const cats: Record<string, string> = {
-      "comp-1": "technical", "comp-2": "technical", "comp-3": "technical",
-      "comp-4": "safety", "comp-5": "technical", "comp-6": "technical",
-      "comp-7": "technical", "comp-8": "technical", "comp-9": "process",
-      "comp-10": "technical", "comp-11": "safety", "comp-12": "technical",
-    };
-    return cats[id] || "technical";
-  }
+  }, [selectedRole, assessments]);
 
   function updateRow(index: number, updates: Partial<AssessmentRow>) {
     setRows((prev) => prev.map((r, i) => (i === index ? { ...r, ...updates } : r)));

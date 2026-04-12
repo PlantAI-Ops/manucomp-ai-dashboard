@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { isMockId } from "@/lib/utils";
 import api from "./api";
 
 // --- Gap Analysis ---
@@ -154,12 +155,17 @@ async function fetchTeamAnalysis(params: { manager_id?: string; department?: str
 }
 
 export function useGapAnalysis(employeeId: string | undefined) {
-  return useQuery({
+  const query = useQuery({
     queryKey: ["gap-analysis", employeeId],
     queryFn: () => fetchGapAnalysis(employeeId!),
-    enabled: !!employeeId,
+    enabled: !!employeeId && !isMockId(employeeId),
     retry: false,
   });
+
+  return {
+    ...query,
+    isMock: isMockId(employeeId ?? ""),
+  };
 }
 
 export function useRoleReadiness() {

@@ -97,6 +97,17 @@ export function useEmployees(filters: EmployeeFilters) {
   });
 }
 
+export function useEmployeesForSelect() {
+  return useQuery({
+    queryKey: ["employees-for-select"],
+    queryFn: async () => {
+      const data = await fetchEmployees({ page: 1, page_size: 100, is_active: true });
+      return data.items;
+    },
+    retry: false,
+  });
+}
+
 export function useRoles() {
   return useQuery({
     queryKey: ["roles"],

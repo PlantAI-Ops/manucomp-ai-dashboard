@@ -10,7 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
-import { MOCK_EMPLOYEES } from "@/services/employees";
+import { useEmployeesForSelect } from "@/services/employees";
+import { useDepartments } from "@/services/departments";
 import {
   useGapAnalysis,
   useRoleReadiness,
@@ -48,8 +49,6 @@ const SEVERITY_CONFIG: Record<string, { color: string; label: string }> = {
   low: { color: "text-muted-foreground bg-muted border-border", label: "Low" },
 };
 
-const DEPARTMENTS = ["Assembly", "Quality", "Welding", "CNC", "Maintenance", "Safety"];
-
 function FallbackBanner() {
   return (
     <Alert className="mb-4 border-info/20 bg-info/5">
@@ -64,7 +63,8 @@ function FallbackBanner() {
 // ======================== TAB 1: GAP ANALYSIS ========================
 function GapAnalysisTab() {
   const [selectedEmpId, setSelectedEmpId] = useState("");
-  const employees = MOCK_EMPLOYEES.filter((e) => e.is_active);
+  const { data: employeesData } = useEmployeesForSelect();
+  const employees = employeesData ?? [];
 
   const { data: apiData } = useGapAnalysis(selectedEmpId || undefined);
   const gapData: GapAnalysis | null = apiData || (selectedEmpId ? buildMockGapAnalysis(selectedEmpId) : null);
@@ -229,6 +229,8 @@ function RoleReadinessTab() {
 function TeamAnalysisTab() {
   const navigate = useNavigate();
   const [department, setDepartment] = useState("");
+  const { data: departmentsData } = useDepartments();
+  const departments = departmentsData?.map(d => d.name) ?? [];
 
   const { data: apiData } = useTeamAnalysis(department ? { department } : {});
   const teamData: TeamAnalysis | null = apiData || (department ? buildMockTeamAnalysis(department) : null);
@@ -241,7 +243,7 @@ function TeamAnalysisTab() {
           <SelectValue placeholder="Filter by department..." />
         </SelectTrigger>
         <SelectContent>
-          {DEPARTMENTS.map((d) => (
+          {departments.map((d) => (
             <SelectItem key={d} value={d}>{d}</SelectItem>
           ))}
         </SelectContent>

@@ -116,6 +116,15 @@ export function useAssessments(filters: AssessmentFilters) {
   });
 }
 
+export function useEmployeeAssessments(employeeId: string) {
+  return useQuery({
+    queryKey: ["assessments", "employee", employeeId],
+    queryFn: () => fetchAssessments({ employee_id: employeeId, page_size: 100 }),
+    enabled: !!employeeId,
+    retry: false,
+  });
+}
+
 export function useCreateAssessment() {
   const qc = useQueryClient();
   return useMutation({

@@ -24,7 +24,9 @@ import {
   ClipboardCheck,
   BarChart3,
   Sparkles,
+  ShieldAlert,
   Settings,
+  Building2,
 } from "lucide-react";
 
 interface NavItem {
@@ -37,11 +39,13 @@ interface NavItem {
 const navItems: NavItem[] = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Employees", url: "/employees", icon: Users },
+  { title: "Departments", url: "/departments", icon: Building2 },
   { title: "Roles", url: "/roles", icon: Briefcase },
   { title: "Competencies", url: "/competencies", icon: Award },
   { title: "Assessments", url: "/assessments", icon: ClipboardCheck },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "AI Assistant", url: "/ai", icon: Sparkles, roles: ["admin", "manager"] },
+  { title: "Audit Log", url: "/audit", icon: ShieldAlert, roles: ["admin"] },
   { title: "Settings", url: "/settings", icon: Settings, roles: ["admin"] },
 ];
 

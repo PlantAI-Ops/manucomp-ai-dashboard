@@ -86,6 +86,11 @@ async function deleteRole(id: string) {
   await api.delete(`/roles/${id}`);
 }
 
+async function fetchRoleDetail(id: string): Promise<RoleListItem> {
+  const { data } = await api.get<RoleListItem>(`/roles/${id}`);
+  return data;
+}
+
 async function suggestCompetencies(body: { role_name: string; role_description: string; department: string }): Promise<CompetencySuggestion[]> {
   const { data } = await api.post<CompetencySuggestion[]>("/ai/role-competency-suggestions", body);
   return data;
@@ -210,6 +215,14 @@ export function useDeleteRole() {
 
 export function useSuggestCompetencies() {
   return useMutation({ mutationFn: suggestCompetencies });
+}
+
+export function useRoleDetail(id: string) {
+  return useQuery({
+    queryKey: ["role-detail", id],
+    queryFn: () => fetchRoleDetail(id),
+    retry: false,
+  });
 }
 
 export { MOCK_COMPETENCIES, DEPARTMENTS };

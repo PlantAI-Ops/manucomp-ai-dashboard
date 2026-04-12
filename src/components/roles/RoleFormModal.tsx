@@ -25,10 +25,10 @@ import {
   useUpdateRole,
   useSuggestCompetencies,
   MOCK_COMPETENCIES,
-  DEPARTMENTS,
   type RoleListItem,
   type CompetencySuggestion,
 } from "@/services/roles";
+import { useDepartments } from "@/services/departments";
 
 interface CompetencyRow {
   id: string; // local key
@@ -54,7 +54,9 @@ export const RoleFormModal = ({ open, onOpenChange, role }: RoleFormModalProps) 
   const [suggestions, setSuggestions] = useState<CompetencySuggestion[]>([]);
 
   const { data: apiCompetencies, isError: compError } = useCompetencyOptions();
-  const competencies = compError || !apiCompetencies ? MOCK_COMPETENCIES : apiCompetencies;
+  const competencies = (compError || !apiCompetencies || !Array.isArray(apiCompetencies)) ? MOCK_COMPETENCIES : apiCompetencies;
+  const { data: apiDepartments } = useDepartments();
+  const departments = apiDepartments?.map(d => d.name) ?? [];
 
   const createMutation = useCreateRole();
   const updateMutation = useUpdateRole();
@@ -206,7 +208,7 @@ export const RoleFormModal = ({ open, onOpenChange, role }: RoleFormModalProps) 
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="__none__">None</SelectItem>
-                {DEPARTMENTS.map((d) => (
+                {departments.map((d) => (
                   <SelectItem key={d} value={d}>{d}</SelectItem>
                 ))}
               </SelectContent>

@@ -16,7 +16,10 @@ import RoleDetailPage from "./pages/RoleDetailPage";
 import CompetenciesPage from "./pages/CompetenciesPage";
 import AssessmentsPage from "./pages/AssessmentsPage";
 import BulkAssessmentPage from "./pages/BulkAssessmentPage";
+import AuditPage from "./pages/AuditPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import AiPage from "./pages/AiPage";
+import DepartmentsPage from "./pages/DepartmentsPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
@@ -49,9 +52,12 @@ const App = () => (
               <Route path="/roles" element={<RolesPage />} />
               <Route path="/roles/:id" element={<RoleDetailPage />} />
               <Route path="/competencies" element={<CompetenciesPage />} />
+              <Route path="/departments" element={<DepartmentsPage />} />
               <Route path="/assessments" element={<AssessmentsPage />} />
               <Route path="/assessments/bulk" element={<BulkAssessmentPage />} />
+              <Route path="/audit" element={<AuditPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/ai" element={<AiPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />

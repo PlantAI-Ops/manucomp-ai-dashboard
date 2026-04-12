@@ -17,21 +17,20 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, isMockId } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { z } from "zod";
 import api from "@/services/api";
 import {
   useRoles,
+  useEmployeesForSelect,
   MOCK_ROLES,
-  MOCK_EMPLOYEES,
   type EmployeeListItem,
   type RoleOption,
 } from "@/services/employees";
+import { useDepartments } from "@/services/departments";
 import { useQueryClient } from "@tanstack/react-query";
-
-const DEPARTMENTS = ["Assembly", "Quality", "Welding", "CNC", "Maintenance", "Safety"];
 
 const employeeSchema = z.object({
   employee_number: z.string().trim().min(1, "Employee number is required"),
@@ -59,7 +58,10 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
   const isEdit = !!employee;
   const queryClient = useQueryClient();
   const { data: apiRoles } = useRoles();
+  const { data: apiEmployees = [] } = useEmployeesForSelect();
+  const { data: apiDepartments } = useDepartments();
   const roles: RoleOption[] = apiRoles ?? MOCK_ROLES;
+  const departments = apiDepartments?.map(d => d.name) ?? [];
 
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -119,19 +121,26 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
 
     setSubmitting(true);
     try {
+      const payload: Record<string, unknown> = {
+        full_name: form.full_name,
+        email: form.email,
+        role_id: form.role_id,
+        department: form.department,
+      };
+
+      if (form.supervisor_id && !isMockId(form.supervisor_id)) {
+        payload.supervisor_id = form.supervisor_id;
+      }
+
       if (isEdit) {
         await api.patch(`/employees/${employee!.id}`, {
-          full_name: form.full_name,
-          email: form.email,
-          role_id: form.role_id,
-          supervisor_id: form.supervisor_id || null,
-          department: form.department,
+          ...payload,
           is_active: employee!.is_active,
         });
       } else {
         await api.post("/employees", {
-          ...form,
-          supervisor_id: form.supervisor_id || null,
+          ...payload,
+          employee_number: form.employee_number,
           hire_date: new Date(form.hire_date).toISOString(),
         });
       }
@@ -221,7 +230,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
                 <SelectValue placeholder="Select department" />
               </SelectTrigger>
               <SelectContent>
-                {DEPARTMENTS.map((d) => (
+                {departments.map((d) => (
                   <SelectItem key={d} value={d}>{d}</SelectItem>
                 ))}
               </SelectContent>
@@ -243,7 +252,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">None</SelectItem>
-                {MOCK_EMPLOYEES.filter((e) => e.id !== employee?.id).slice(0, 20).map((e) => (
+                {apiEmployees.filter((e) => e.id !== employee?.id).slice(0, 20).map((e) => (
                   <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>
                 ))}
               </SelectContent>

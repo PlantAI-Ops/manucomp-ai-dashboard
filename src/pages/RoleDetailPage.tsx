@@ -16,19 +16,8 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import api from "@/services/api";
-import { useDeleteRole, MOCK_ROLES, type RoleListItem } from "@/services/roles";
+import { useDeleteRole, useRoleDetail, MOCK_ROLES, type RoleListItem } from "@/services/roles";
 import { MOCK_EMPLOYEES, type EmployeeListItem } from "@/services/employees";
-
-function useRoleDetail(id: string) {
-  return useQuery({
-    queryKey: ["role-detail", id],
-    queryFn: async () => {
-      const { data } = await api.get<RoleListItem>(`/roles/${id}`);
-      return data;
-    },
-    retry: false,
-  });
-}
 
 function useRoleEmployees(roleId: string) {
   return useQuery({
@@ -51,7 +40,7 @@ const RoleDetailPage = () => {
   const { data: apiEmployees, isError: empError } = useRoleEmployees(id!);
 
   const role = isError || !apiRole ? MOCK_ROLES.find((r) => r.id === id) ?? MOCK_ROLES[0] : apiRole;
-  const employees = empError || !apiEmployees
+  const employees = empError || !apiEmployees || !Array.isArray(apiEmployees)
     ? MOCK_EMPLOYEES.filter((e) => e.role_id === id).slice(0, 20)
     : apiEmployees;
 

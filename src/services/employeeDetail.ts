@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { isMockId } from "@/lib/utils";
 import api from "./api";
 
 export interface CompetencySummaryItem {
@@ -154,17 +155,29 @@ export async function generateAiInsight(employeeId: string): Promise<AiInsightRe
 }
 
 export function useEmployeeDetail(id: string) {
-  return useQuery({
+  const query = useQuery({
     queryKey: ["employee-detail", id],
     queryFn: () => fetchEmployeeDetail(id),
+    enabled: !isMockId(id),
     retry: false,
   });
+
+  return {
+    ...query,
+    isMock: isMockId(id),
+  };
 }
 
 export function useAssessments(employeeId: string) {
-  return useQuery({
+  const query = useQuery({
     queryKey: ["assessments", employeeId],
     queryFn: () => fetchAssessments(employeeId),
+    enabled: !isMockId(employeeId),
     retry: false,
   });
+
+  return {
+    ...query,
+    isMock: isMockId(employeeId),
+  };
 }
