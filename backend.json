@@ -1,0 +1,3697 @@
+{
+"openapi": "3.1.0",
+"info": {
+"title": "ManuComp AI API",
+"description": "API for ManuComp AI - Competency Management System with AI/LLM capabilities",
+"version": "1.0.0"
+},
+"paths": {
+"/api/v1/auth/register": {
+"post": {
+"tags": [
+"Authentication"
+],
+"summary": "Register User",
+"description": "Register a new user.",
+"operationId": "register_user_api_v1_auth_register_post",
+"requestBody": {
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/UserCreate"
+}
+}
+},
+"required": true
+},
+"responses": {
+"201": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/UserResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/auth/login": {
+"post": {
+"tags": [
+"Authentication"
+],
+"summary": "Login For Access Token",
+"description": "Authenticate user and return an access token.",
+"operationId": "login_for_access_token_api_v1_auth_login_post",
+"requestBody": {
+"content": {
+"application/x-www-form-urlencoded": {
+"schema": {
+"$ref": "#/components/schemas/Body_login_for_access_token_api_v1_auth_login_post"
+}
+}
+},
+"required": true
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/Token"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/auth/me": {
+"get": {
+"tags": [
+"Authentication"
+],
+"summary": "Read Users Me",
+"description": "Get current user profile.",
+"operationId": "read_users_me_api_v1_auth_me_get",
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/UserResponse"
+}
+}
+}
+}
+},
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+]
+}
+},
+"/api/v1/employees/": {
+"post": {
+"tags": [
+"Employees"
+],
+"summary": "Create Employee",
+"description": "Create a new employee. (Manager/Admin only)",
+"operationId": "create_employee_api_v1_employees__post",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"requestBody": {
+"required": true,
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeCreate"
+}
+}
+}
+},
+"responses": {
+"201": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"get": {
+"tags": [
+"Employees"
+],
+"summary": "List Employees",
+"description": "List all employees with pagination and filters.",
+"operationId": "list_employees_api_v1_employees__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "page",
+"in": "query",
+"required": false,
+"schema": {
+"type": "integer",
+"minimum": 1,
+"default": 1,
+"title": "Page"
+}
+},
+{
+"name": "page_size",
+"in": "query",
+"required": false,
+"schema": {
+"type": "integer",
+"maximum": 100,
+"minimum": 1,
+"default": 20,
+"title": "Page Size"
+}
+},
+{
+"name": "role_id",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Role Id"
+}
+},
+{
+"name": "department",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Department"
+}
+},
+{
+"name": "is_active",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "boolean"
+},
+{
+"type": "null"
+}
+],
+"title": "Is Active"
+}
+},
+{
+"name": "search",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Search"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/PaginatedResponse_EmployeeResponse_"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/employees/{employee_id}": {
+"get": {
+"tags": [
+"Employees"
+],
+"summary": "Get Employee",
+"description": "Get employee details with competency summary.",
+"operationId": "get_employee_api_v1_employees__employee_id__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "employee_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Employee Id"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeDetailResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"patch": {
+"tags": [
+"Employees"
+],
+"summary": "Update Employee",
+"description": "Update employee. (Manager/Admin only)",
+"operationId": "update_employee_api_v1_employees__employee_id__patch",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "employee_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Employee Id"
+}
+}
+],
+"requestBody": {
+"required": true,
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeUpdate"
+}
+}
+}
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"delete": {
+"tags": [
+"Employees"
+],
+"summary": "Delete Employee",
+"description": "Soft delete employee. (Admin only)",
+"operationId": "delete_employee_api_v1_employees__employee_id__delete",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "employee_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Employee Id"
+}
+}
+],
+"responses": {
+"204": {
+"description": "Successful Response"
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/roles/": {
+"post": {
+"tags": [
+"Roles"
+],
+"summary": "Create Role",
+"description": "Create a new role. (Admin only)",
+"operationId": "create_role_api_v1_roles__post",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"requestBody": {
+"required": true,
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/RoleCreate"
+}
+}
+}
+},
+"responses": {
+"201": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/RoleResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"get": {
+"tags": [
+"Roles"
+],
+"summary": "List Roles",
+"description": "List all roles with pagination and search.",
+"operationId": "list_roles_api_v1_roles__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "page",
+"in": "query",
+"required": false,
+"schema": {
+"type": "integer",
+"minimum": 1,
+"default": 1,
+"title": "Page"
+}
+},
+{
+"name": "page_size",
+"in": "query",
+"required": false,
+"schema": {
+"type": "integer",
+"maximum": 100,
+"minimum": 1,
+"default": 20,
+"title": "Page Size"
+}
+},
+{
+"name": "search",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Search"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/PaginatedResponse_RoleResponse_"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/roles/{role_id}": {
+"get": {
+"tags": [
+"Roles"
+],
+"summary": "Get Role",
+"description": "Get role details.",
+"operationId": "get_role_api_v1_roles__role_id__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "role_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Role Id"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/RoleResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"patch": {
+"tags": [
+"Roles"
+],
+"summary": "Update Role",
+"description": "Update role. (Admin only)",
+"operationId": "update_role_api_v1_roles__role_id__patch",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "role_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Role Id"
+}
+}
+],
+"requestBody": {
+"required": true,
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/RoleUpdate"
+}
+}
+}
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/RoleResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"delete": {
+"tags": [
+"Roles"
+],
+"summary": "Delete Role",
+"description": "Delete role. (Admin only)",
+"operationId": "delete_role_api_v1_roles__role_id__delete",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "role_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Role Id"
+}
+}
+],
+"responses": {
+"204": {
+"description": "Successful Response"
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/competencies/": {
+"post": {
+"tags": [
+"Competencies"
+],
+"summary": "Create Competency",
+"description": "Create a new competency. (Admin only)",
+"operationId": "create_competency_api_v1_competencies__post",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"requestBody": {
+"required": true,
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CompetencyCreate"
+}
+}
+}
+},
+"responses": {
+"201": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CompetencyResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"get": {
+"tags": [
+"Competencies"
+],
+"summary": "List Competencies",
+"description": "List all competencies with pagination and filters.",
+"operationId": "list_competencies_api_v1_competencies__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "page",
+"in": "query",
+"required": false,
+"schema": {
+"type": "integer",
+"minimum": 1,
+"default": 1,
+"title": "Page"
+}
+},
+{
+"name": "page_size",
+"in": "query",
+"required": false,
+"schema": {
+"type": "integer",
+"maximum": 100,
+"minimum": 1,
+"default": 20,
+"title": "Page Size"
+}
+},
+{
+"name": "category",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Category"
+}
+},
+{
+"name": "search",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Search"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/PaginatedResponse_CompetencyResponse_"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/competencies/{competency_id}": {
+"get": {
+"tags": [
+"Competencies"
+],
+"summary": "Get Competency",
+"description": "Get competency details.",
+"operationId": "get_competency_api_v1_competencies__competency_id__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "competency_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Competency Id"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CompetencyResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"patch": {
+"tags": [
+"Competencies"
+],
+"summary": "Update Competency",
+"description": "Update competency. (Admin only)",
+"operationId": "update_competency_api_v1_competencies__competency_id__patch",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "competency_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Competency Id"
+}
+}
+],
+"requestBody": {
+"required": true,
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CompetencyUpdate"
+}
+}
+}
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CompetencyResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"delete": {
+"tags": [
+"Competencies"
+],
+"summary": "Delete Competency",
+"description": "Soft delete competency. (Admin only)",
+"operationId": "delete_competency_api_v1_competencies__competency_id__delete",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "competency_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Competency Id"
+}
+}
+],
+"responses": {
+"204": {
+"description": "Successful Response"
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/assessments/": {
+"post": {
+"tags": [
+"Assessments"
+],
+"summary": "Create Assessment",
+"description": "Create a new assessment. (Manager/Admin only)",
+"operationId": "create_assessment_api_v1_assessments__post",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"requestBody": {
+"required": true,
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AssessmentCreate"
+}
+}
+}
+},
+"responses": {
+"201": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AssessmentResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"get": {
+"tags": [
+"Assessments"
+],
+"summary": "List Assessments",
+"description": "List all assessments with pagination and filters.",
+"operationId": "list_assessments_api_v1_assessments__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "page",
+"in": "query",
+"required": false,
+"schema": {
+"type": "integer",
+"minimum": 1,
+"default": 1,
+"title": "Page"
+}
+},
+{
+"name": "page_size",
+"in": "query",
+"required": false,
+"schema": {
+"type": "integer",
+"maximum": 100,
+"minimum": 1,
+"default": 20,
+"title": "Page Size"
+}
+},
+{
+"name": "employee_id",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Employee Id"
+}
+},
+{
+"name": "competency_id",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Competency Id"
+}
+},
+{
+"name": "status",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Status"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/PaginatedResponse_AssessmentResponse_"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/assessments/bulk": {
+"post": {
+"tags": [
+"Assessments"
+],
+"summary": "Bulk Create Assessments",
+"description": "Bulk create assessments. (Manager/Admin only)",
+"operationId": "bulk_create_assessments_api_v1_assessments_bulk_post",
+"requestBody": {
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AssessmentBulkCreate"
+}
+}
+},
+"required": true
+},
+"responses": {
+"201": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"items": {
+"$ref": "#/components/schemas/AssessmentResponse"
+},
+"type": "array",
+"title": "Response Bulk Create Assessments Api V1 Assessments Bulk Post"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+},
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+]
+}
+},
+"/api/v1/assessments/{assessment_id}": {
+"get": {
+"tags": [
+"Assessments"
+],
+"summary": "Get Assessment",
+"description": "Get assessment details.",
+"operationId": "get_assessment_api_v1_assessments__assessment_id__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "assessment_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Assessment Id"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AssessmentResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"patch": {
+"tags": [
+"Assessments"
+],
+"summary": "Update Assessment",
+"description": "Update assessment. (Manager/Admin only)",
+"operationId": "update_assessment_api_v1_assessments__assessment_id__patch",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "assessment_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Assessment Id"
+}
+}
+],
+"requestBody": {
+"required": true,
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AssessmentUpdate"
+}
+}
+}
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AssessmentResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+},
+"delete": {
+"tags": [
+"Assessments"
+],
+"summary": "Delete Assessment",
+"description": "Hard delete assessment. (Admin only)",
+"operationId": "delete_assessment_api_v1_assessments__assessment_id__delete",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "assessment_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Assessment Id"
+}
+}
+],
+"responses": {
+"204": {
+"description": "Successful Response"
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/analytics/gap-analysis/{employee_id}": {
+"get": {
+"tags": [
+"Analytics"
+],
+"summary": "Get Employee Gap Analysis",
+"description": "Get competency gap analysis for a specific employee. (Manager/Admin only)",
+"operationId": "get_employee_gap_analysis_api_v1_analytics_gap_analysis__employee_id__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "employee_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Employee Id"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/EmployeeGapAnalysis"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/analytics/role-readiness/{employee_id}": {
+"get": {
+"tags": [
+"Analytics"
+],
+"summary": "Get Employee Role Readiness",
+"description": "Get role readiness for a specific employee. (Manager/Admin only)",
+"operationId": "get_employee_role_readiness_api_v1_analytics_role_readiness__employee_id__get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "employee_id",
+"in": "path",
+"required": true,
+"schema": {
+"type": "string",
+"title": "Employee Id"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"type": "array",
+"items": {
+"$ref": "#/components/schemas/RoleReadiness"
+},
+"title": "Response Get Employee Role Readiness Api V1 Analytics Role Readiness  Employee Id  Get"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/analytics/dashboard-summary": {
+"get": {
+"tags": [
+"Analytics"
+],
+"summary": "Get Dashboard Summary",
+"description": "Get overall dashboard summary for managers/admins.",
+"operationId": "get_dashboard_summary_api_v1_analytics_dashboard_summary_get",
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/DashboardSummary"
+}
+}
+}
+}
+},
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+]
+}
+},
+"/api/v1/analytics/team-analysis": {
+"get": {
+"tags": [
+"Analytics"
+],
+"summary": "Get Team Analysis",
+"description": "Get team-level competency analysis. (Manager/Admin only)",
+"operationId": "get_team_analysis_api_v1_analytics_team_analysis_get",
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+],
+"parameters": [
+{
+"name": "manager_id",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Manager Id"
+}
+},
+{
+"name": "department",
+"in": "query",
+"required": false,
+"schema": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Department"
+}
+}
+],
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/TeamAnalysis"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+}
+}
+},
+"/api/v1/ai/query": {
+"post": {
+"tags": [
+"AI"
+],
+"summary": "Ai Query",
+"description": "Submit a natural language query to the AI for insights. (Manager/Admin only)",
+"operationId": "ai_query_api_v1_ai_query_post",
+"requestBody": {
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AIQueryRequest"
+}
+}
+},
+"required": true
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AIQueryResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+},
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+]
+}
+},
+"/api/v1/ai/insight": {
+"post": {
+"tags": [
+"AI"
+],
+"summary": "Ai Insight",
+"description": "Request AI-driven insights on specific employees or competencies. (Manager/Admin only)",
+"operationId": "ai_insight_api_v1_ai_insight_post",
+"requestBody": {
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AIInsightRequest"
+}
+}
+},
+"required": true
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/AIInsightResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+},
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+]
+}
+},
+"/api/v1/ai/role-competency-suggestions": {
+"post": {
+"tags": [
+"AI"
+],
+"summary": "Get Role Competency Suggestions",
+"description": "Get AI-driven suggestions for competencies required for a specific role. (Manager/Admin only)",
+"operationId": "get_role_competency_suggestions_api_v1_ai_role_competency_suggestions_post",
+"requestBody": {
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/RoleCompetencySuggestionsRequest"
+}
+}
+},
+"required": true
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/RoleCompetencySuggestionsResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+},
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+]
+}
+},
+"/api/v1/ai/competency-recommendations": {
+"post": {
+"tags": [
+"AI"
+],
+"summary": "Get Competency Recommendations",
+"description": "Suggest competencies for an employee to develop based on their gaps. (Manager/Admin only)",
+"operationId": "get_competency_recommendations_api_v1_ai_competency_recommendations_post",
+"requestBody": {
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CompetencyRecommendationRequest"
+}
+}
+},
+"required": true
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/CompetencyRecommendationResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+},
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+]
+}
+},
+"/api/v1/ai/learning-paths": {
+"post": {
+"tags": [
+"AI"
+],
+"summary": "Get Learning Paths",
+"description": "Recommend learning paths for an employee to improve a specific competency. (Manager/Admin only)",
+"operationId": "get_learning_paths_api_v1_ai_learning_paths_post",
+"requestBody": {
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/LearningPathRecommendationRequest"
+}
+}
+},
+"required": true
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/LearningPathRecommendationResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+},
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+]
+}
+},
+"/api/v1/ai/feedback-analysis": {
+"post": {
+"tags": [
+"AI"
+],
+"summary": "Analyze Feedback",
+"description": "Analyze feedback text for sentiment, themes, and key points. (Manager/Admin only)",
+"operationId": "analyze_feedback_api_v1_ai_feedback_analysis_post",
+"requestBody": {
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/FeedbackAnalysisRequest"
+}
+}
+},
+"required": true
+},
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/FeedbackAnalysisResponse"
+}
+}
+}
+},
+"422": {
+"description": "Validation Error",
+"content": {
+"application/json": {
+"schema": {
+"$ref": "#/components/schemas/HTTPValidationError"
+}
+}
+}
+}
+},
+"security": [
+{
+"OAuth2PasswordBearer": []
+}
+]
+}
+},
+"/api/v1/health": {
+"get": {
+"tags": [
+"Health Check"
+],
+"summary": "Health Check",
+"operationId": "health_check_api_v1_health_get",
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {}
+}
+}
+}
+}
+}
+},
+"/api/v1/health/detailed": {
+"get": {
+"tags": [
+"Health Check"
+],
+"summary": "Detailed Health Check",
+"description": "Detailed health check including database connectivity.",
+"operationId": "detailed_health_check_api_v1_health_detailed_get",
+"responses": {
+"200": {
+"description": "Successful Response",
+"content": {
+"application/json": {
+"schema": {}
+}
+}
+}
+}
+}
+}
+},
+"components": {
+"schemas": {
+"AIInsightRequest": {
+"properties": {
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+}
+},
+"type": "object",
+"required": [
+"employee_id"
+],
+"title": "AIInsightRequest"
+},
+"AIInsightResponse": {
+"properties": {
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+},
+"employee_name": {
+"type": "string",
+"title": "Employee Name"
+},
+"summary": {
+"type": "string",
+"title": "Summary"
+},
+"recommendations": {
+"items": {
+"type": "string"
+},
+"type": "array",
+"title": "Recommendations"
+},
+"priority_actions": {
+"items": {
+"type": "string"
+},
+"type": "array",
+"title": "Priority Actions"
+}
+},
+"type": "object",
+"required": [
+"employee_id",
+"employee_name",
+"summary",
+"recommendations",
+"priority_actions"
+],
+"title": "AIInsightResponse"
+},
+"AIQueryRequest": {
+"properties": {
+"query": {
+"type": "string",
+"title": "Query"
+},
+"context_filters": {
+"anyOf": [
+{
+"additionalProperties": true,
+"type": "object"
+},
+{
+"type": "null"
+}
+],
+"title": "Context Filters"
+}
+},
+"type": "object",
+"required": [
+"query"
+],
+"title": "AIQueryRequest"
+},
+"AIQueryResponse": {
+"properties": {
+"query": {
+"type": "string",
+"title": "Query"
+},
+"answer": {
+"type": "string",
+"title": "Answer"
+},
+"sources": {
+"items": {
+"additionalProperties": true,
+"type": "object"
+},
+"type": "array",
+"title": "Sources"
+},
+"confidence": {
+"anyOf": [
+{
+"type": "number"
+},
+{
+"type": "null"
+}
+],
+"title": "Confidence"
+}
+},
+"type": "object",
+"required": [
+"query",
+"answer",
+"sources"
+],
+"title": "AIQueryResponse"
+},
+"AssessmentBulkCreate": {
+"properties": {
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+},
+"assessments": {
+"items": {
+"additionalProperties": true,
+"type": "object"
+},
+"type": "array",
+"title": "Assessments"
+}
+},
+"type": "object",
+"required": [
+"employee_id",
+"assessments"
+],
+"title": "AssessmentBulkCreate",
+"description": "Create multiple assessments at once"
+},
+"AssessmentCreate": {
+"properties": {
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+},
+"competency_id": {
+"type": "string",
+"title": "Competency Id"
+},
+"assessed_level": {
+"type": "integer",
+"title": "Assessed Level"
+},
+"assessor_type": {
+"$ref": "#/components/schemas/AssessorType"
+},
+"notes": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Notes"
+},
+"evidence": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Evidence"
+}
+},
+"type": "object",
+"required": [
+"employee_id",
+"competency_id",
+"assessed_level",
+"assessor_type"
+],
+"title": "AssessmentCreate"
+},
+"AssessmentResponse": {
+"properties": {
+"id": {
+"type": "string",
+"title": "Id"
+},
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+},
+"employee_name": {
+"type": "string",
+"title": "Employee Name"
+},
+"competency_id": {
+"type": "string",
+"title": "Competency Id"
+},
+"competency_name": {
+"type": "string",
+"title": "Competency Name"
+},
+"assessed_level": {
+"type": "integer",
+"title": "Assessed Level"
+},
+"assessor_type": {
+"$ref": "#/components/schemas/AssessorType"
+},
+"assessor_id": {
+"type": "string",
+"title": "Assessor Id"
+},
+"assessor_name": {
+"type": "string",
+"title": "Assessor Name"
+},
+"notes": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Notes"
+},
+"assessed_at": {
+"type": "string",
+"format": "date-time",
+"title": "Assessed At"
+}
+},
+"type": "object",
+"required": [
+"id",
+"employee_id",
+"employee_name",
+"competency_id",
+"competency_name",
+"assessed_level",
+"assessor_type",
+"assessor_id",
+"assessor_name",
+"assessed_at"
+],
+"title": "AssessmentResponse"
+},
+"AssessmentUpdate": {
+"properties": {
+"assessed_level": {
+"anyOf": [
+{
+"type": "integer"
+},
+{
+"type": "null"
+}
+],
+"title": "Assessed Level"
+},
+"notes": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Notes"
+},
+"evidence": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Evidence"
+}
+},
+"type": "object",
+"title": "AssessmentUpdate"
+},
+"AssessorType": {
+"type": "string",
+"enum": [
+"self",
+"supervisor",
+"peer",
+"external"
+],
+"title": "AssessorType"
+},
+"Body_login_for_access_token_api_v1_auth_login_post": {
+"properties": {
+"grant_type": {
+"anyOf": [
+{
+"type": "string",
+"pattern": "^password$"
+},
+{
+"type": "null"
+}
+],
+"title": "Grant Type"
+},
+"username": {
+"type": "string",
+"title": "Username"
+},
+"password": {
+"type": "string",
+"format": "password",
+"title": "Password"
+},
+"scope": {
+"type": "string",
+"title": "Scope",
+"default": ""
+},
+"client_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Client Id"
+},
+"client_secret": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"format": "password",
+"title": "Client Secret"
+}
+},
+"type": "object",
+"required": [
+"username",
+"password"
+],
+"title": "Body_login_for_access_token_api_v1_auth_login_post"
+},
+"CompetencyCategory": {
+"type": "string",
+"enum": [
+"technical",
+"soft_skills",
+"safety",
+"regulatory",
+"process"
+],
+"title": "CompetencyCategory"
+},
+"CompetencyCreate": {
+"properties": {
+"name": {
+"type": "string",
+"title": "Name"
+},
+"description": {
+"type": "string",
+"title": "Description"
+},
+"category": {
+"$ref": "#/components/schemas/CompetencyCategory"
+},
+"is_safety_critical": {
+"type": "boolean",
+"title": "Is Safety Critical",
+"default": false
+},
+"detailed_description": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Detailed Description"
+},
+"best_practices": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Best Practices"
+},
+"common_mistakes": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Common Mistakes"
+}
+},
+"type": "object",
+"required": [
+"name",
+"description",
+"category"
+],
+"title": "CompetencyCreate"
+},
+"CompetencyGap": {
+"properties": {
+"competency_id": {
+"type": "string",
+"title": "Competency Id"
+},
+"competency_name": {
+"type": "string",
+"title": "Competency Name"
+},
+"category": {
+"$ref": "#/components/schemas/CompetencyCategory"
+},
+"is_safety_critical": {
+"type": "boolean",
+"title": "Is Safety Critical"
+},
+"required_level": {
+"type": "integer",
+"title": "Required Level"
+},
+"actual_level": {
+"type": "integer",
+"title": "Actual Level"
+},
+"gap": {
+"type": "integer",
+"title": "Gap"
+},
+"severity": {
+"$ref": "#/components/schemas/GapSeverity"
+}
+},
+"type": "object",
+"required": [
+"competency_id",
+"competency_name",
+"category",
+"is_safety_critical",
+"required_level",
+"actual_level",
+"gap",
+"severity"
+],
+"title": "CompetencyGap"
+},
+"CompetencyRecommendationRequest": {
+"properties": {
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+},
+"assessment_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Assessment Id"
+},
+"role_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Role Id"
+}
+},
+"type": "object",
+"required": [
+"employee_id"
+],
+"title": "CompetencyRecommendationRequest"
+},
+"CompetencyRecommendationResponse": {
+"properties": {
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+},
+"recommendations": {
+"items": {
+"$ref": "#/components/schemas/CompetencySuggestion"
+},
+"type": "array",
+"title": "Recommendations"
+}
+},
+"type": "object",
+"required": [
+"employee_id",
+"recommendations"
+],
+"title": "CompetencyRecommendationResponse"
+},
+"CompetencyRequirementCreate": {
+"properties": {
+"competency_id": {
+"type": "string",
+"title": "Competency Id"
+},
+"required_level": {
+"type": "integer",
+"title": "Required Level"
+},
+"is_mandatory": {
+"type": "boolean",
+"title": "Is Mandatory",
+"default": true
+}
+},
+"type": "object",
+"required": [
+"competency_id",
+"required_level"
+],
+"title": "CompetencyRequirementCreate"
+},
+"CompetencyRequirementResponse": {
+"properties": {
+"competency_id": {
+"type": "string",
+"title": "Competency Id"
+},
+"competency_name": {
+"type": "string",
+"title": "Competency Name"
+},
+"required_level": {
+"type": "integer",
+"title": "Required Level"
+},
+"is_mandatory": {
+"type": "boolean",
+"title": "Is Mandatory"
+}
+},
+"type": "object",
+"required": [
+"competency_id",
+"competency_name",
+"required_level",
+"is_mandatory"
+],
+"title": "CompetencyRequirementResponse"
+},
+"CompetencyResponse": {
+"properties": {
+"id": {
+"type": "string",
+"title": "Id"
+},
+"name": {
+"type": "string",
+"title": "Name"
+},
+"description": {
+"type": "string",
+"title": "Description"
+},
+"category": {
+"$ref": "#/components/schemas/CompetencyCategory"
+},
+"is_safety_critical": {
+"type": "boolean",
+"title": "Is Safety Critical"
+},
+"created_at": {
+"type": "string",
+"format": "date-time",
+"title": "Created At"
+}
+},
+"type": "object",
+"required": [
+"id",
+"name",
+"description",
+"category",
+"is_safety_critical",
+"created_at"
+],
+"title": "CompetencyResponse"
+},
+"CompetencySuggestion": {
+"properties": {
+"name": {
+"type": "string",
+"title": "Name"
+},
+"description": {
+"type": "string",
+"title": "Description"
+},
+"category": {
+"$ref": "#/components/schemas/CompetencyCategory"
+},
+"confidence": {
+"type": "number",
+"title": "Confidence"
+},
+"reasoning": {
+"type": "string",
+"title": "Reasoning"
+}
+},
+"type": "object",
+"required": [
+"name",
+"description",
+"category",
+"confidence",
+"reasoning"
+],
+"title": "CompetencySuggestion"
+},
+"CompetencyUpdate": {
+"properties": {
+"name": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Name"
+},
+"description": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Description"
+},
+"category": {
+"anyOf": [
+{
+"$ref": "#/components/schemas/CompetencyCategory"
+},
+{
+"type": "null"
+}
+]
+},
+"is_safety_critical": {
+"anyOf": [
+{
+"type": "boolean"
+},
+{
+"type": "null"
+}
+],
+"title": "Is Safety Critical"
+},
+"detailed_description": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Detailed Description"
+},
+"best_practices": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Best Practices"
+},
+"common_mistakes": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Common Mistakes"
+}
+},
+"type": "object",
+"title": "CompetencyUpdate"
+},
+"DashboardSummary": {
+"properties": {
+"total_employees": {
+"type": "integer",
+"title": "Total Employees"
+},
+"total_roles": {
+"type": "integer",
+"title": "Total Roles"
+},
+"total_competencies": {
+"type": "integer",
+"title": "Total Competencies"
+},
+"assessed_employees": {
+"type": "integer",
+"title": "Assessed Employees"
+},
+"assessment_percentage": {
+"type": "number",
+"title": "Assessment Percentage"
+},
+"critical_gaps": {
+"type": "integer",
+"title": "Critical Gaps"
+},
+"role_readiness": {
+"items": {
+"$ref": "#/components/schemas/RoleReadiness"
+},
+"type": "array",
+"title": "Role Readiness"
+},
+"top_skill_gaps": {
+"items": {
+"additionalProperties": true,
+"type": "object"
+},
+"type": "array",
+"title": "Top Skill Gaps"
+}
+},
+"type": "object",
+"required": [
+"total_employees",
+"total_roles",
+"total_competencies",
+"assessed_employees",
+"assessment_percentage",
+"critical_gaps",
+"role_readiness",
+"top_skill_gaps"
+],
+"title": "DashboardSummary"
+},
+"EmployeeCreate": {
+"properties": {
+"employee_number": {
+"type": "string",
+"title": "Employee Number"
+},
+"full_name": {
+"type": "string",
+"title": "Full Name"
+},
+"email": {
+"type": "string",
+"format": "email",
+"title": "Email"
+},
+"role_id": {
+"type": "string",
+"title": "Role Id"
+},
+"supervisor_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Supervisor Id"
+},
+"department": {
+"type": "string",
+"title": "Department"
+},
+"hire_date": {
+"type": "string",
+"format": "date-time",
+"title": "Hire Date"
+}
+},
+"type": "object",
+"required": [
+"employee_number",
+"full_name",
+"email",
+"role_id",
+"department",
+"hire_date"
+],
+"title": "EmployeeCreate"
+},
+"EmployeeDetailResponse": {
+"properties": {
+"id": {
+"type": "string",
+"title": "Id"
+},
+"employee_number": {
+"type": "string",
+"title": "Employee Number"
+},
+"full_name": {
+"type": "string",
+"title": "Full Name"
+},
+"email": {
+"type": "string",
+"format": "email",
+"title": "Email"
+},
+"role_id": {
+"type": "string",
+"title": "Role Id"
+},
+"role_name": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Role Name"
+},
+"supervisor_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Supervisor Id"
+},
+"supervisor_name": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Supervisor Name"
+},
+"department": {
+"type": "string",
+"title": "Department"
+},
+"hire_date": {
+"type": "string",
+"format": "date-time",
+"title": "Hire Date"
+},
+"is_active": {
+"type": "boolean",
+"title": "Is Active"
+},
+"created_at": {
+"type": "string",
+"format": "date-time",
+"title": "Created At"
+},
+"competency_summary": {
+"anyOf": [
+{
+"additionalProperties": true,
+"type": "object"
+},
+{
+"type": "null"
+}
+],
+"title": "Competency Summary"
+}
+},
+"type": "object",
+"required": [
+"id",
+"employee_number",
+"full_name",
+"email",
+"role_id",
+"department",
+"hire_date",
+"is_active",
+"created_at"
+],
+"title": "EmployeeDetailResponse",
+"description": "Extended response with competency data"
+},
+"EmployeeGapAnalysis": {
+"properties": {
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+},
+"employee_name": {
+"type": "string",
+"title": "Employee Name"
+},
+"role_name": {
+"type": "string",
+"title": "Role Name"
+},
+"gaps": {
+"items": {
+"$ref": "#/components/schemas/CompetencyGap"
+},
+"type": "array",
+"title": "Gaps"
+},
+"critical_gaps": {
+"type": "integer",
+"title": "Critical Gaps"
+},
+"high_gaps": {
+"type": "integer",
+"title": "High Gaps"
+},
+"total_gaps": {
+"type": "integer",
+"title": "Total Gaps"
+},
+"readiness_percentage": {
+"type": "number",
+"title": "Readiness Percentage"
+}
+},
+"type": "object",
+"required": [
+"employee_id",
+"employee_name",
+"role_name",
+"gaps",
+"critical_gaps",
+"high_gaps",
+"total_gaps",
+"readiness_percentage"
+],
+"title": "EmployeeGapAnalysis"
+},
+"EmployeeResponse": {
+"properties": {
+"id": {
+"type": "string",
+"title": "Id"
+},
+"employee_number": {
+"type": "string",
+"title": "Employee Number"
+},
+"full_name": {
+"type": "string",
+"title": "Full Name"
+},
+"email": {
+"type": "string",
+"format": "email",
+"title": "Email"
+},
+"role_id": {
+"type": "string",
+"title": "Role Id"
+},
+"role_name": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Role Name"
+},
+"supervisor_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Supervisor Id"
+},
+"supervisor_name": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Supervisor Name"
+},
+"department": {
+"type": "string",
+"title": "Department"
+},
+"hire_date": {
+"type": "string",
+"format": "date-time",
+"title": "Hire Date"
+},
+"is_active": {
+"type": "boolean",
+"title": "Is Active"
+},
+"created_at": {
+"type": "string",
+"format": "date-time",
+"title": "Created At"
+}
+},
+"type": "object",
+"required": [
+"id",
+"employee_number",
+"full_name",
+"email",
+"role_id",
+"department",
+"hire_date",
+"is_active",
+"created_at"
+],
+"title": "EmployeeResponse"
+},
+"EmployeeUpdate": {
+"properties": {
+"full_name": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Full Name"
+},
+"email": {
+"anyOf": [
+{
+"type": "string",
+"format": "email"
+},
+{
+"type": "null"
+}
+],
+"title": "Email"
+},
+"role_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Role Id"
+},
+"supervisor_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Supervisor Id"
+},
+"department": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Department"
+},
+"is_active": {
+"anyOf": [
+{
+"type": "boolean"
+},
+{
+"type": "null"
+}
+],
+"title": "Is Active"
+}
+},
+"type": "object",
+"title": "EmployeeUpdate"
+},
+"FeedbackAnalysisRequest": {
+"properties": {
+"feedback_text": {
+"type": "string",
+"title": "Feedback Text"
+},
+"employee_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Employee Id"
+},
+"assessment_id": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Assessment Id"
+}
+},
+"type": "object",
+"required": [
+"feedback_text"
+],
+"title": "FeedbackAnalysisRequest"
+},
+"FeedbackAnalysisResponse": {
+"properties": {
+"analysis": {
+"type": "string",
+"title": "Analysis"
+},
+"sentiment": {
+"type": "string",
+"title": "Sentiment"
+},
+"key_themes": {
+"items": {
+"type": "string"
+},
+"type": "array",
+"title": "Key Themes"
+}
+},
+"type": "object",
+"required": [
+"analysis",
+"sentiment",
+"key_themes"
+],
+"title": "FeedbackAnalysisResponse"
+},
+"GapSeverity": {
+"type": "string",
+"enum": [
+"low",
+"medium",
+"high",
+"critical"
+],
+"title": "GapSeverity"
+},
+"HTTPValidationError": {
+"properties": {
+"detail": {
+"items": {
+"$ref": "#/components/schemas/ValidationError"
+},
+"type": "array",
+"title": "Detail"
+}
+},
+"type": "object",
+"title": "HTTPValidationError"
+},
+"LearningPathRecommendationRequest": {
+"properties": {
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+},
+"competency_id": {
+"type": "string",
+"title": "Competency Id"
+}
+},
+"type": "object",
+"required": [
+"employee_id",
+"competency_id"
+],
+"title": "LearningPathRecommendationRequest"
+},
+"LearningPathRecommendationResponse": {
+"properties": {
+"employee_id": {
+"type": "string",
+"title": "Employee Id"
+},
+"competency_id": {
+"type": "string",
+"title": "Competency Id"
+},
+"learning_paths": {
+"items": {
+"additionalProperties": true,
+"type": "object"
+},
+"type": "array",
+"title": "Learning Paths"
+}
+},
+"type": "object",
+"required": [
+"employee_id",
+"competency_id",
+"learning_paths"
+],
+"title": "LearningPathRecommendationResponse"
+},
+"PaginatedResponse_AssessmentResponse_": {
+"properties": {
+"items": {
+"items": {
+"$ref": "#/components/schemas/AssessmentResponse"
+},
+"type": "array",
+"title": "Items"
+},
+"total": {
+"type": "integer",
+"title": "Total"
+},
+"page": {
+"type": "integer",
+"title": "Page"
+},
+"page_size": {
+"type": "integer",
+"title": "Page Size"
+},
+"total_pages": {
+"type": "integer",
+"title": "Total Pages"
+}
+},
+"type": "object",
+"required": [
+"items",
+"total",
+"page",
+"page_size",
+"total_pages"
+],
+"title": "PaginatedResponse[AssessmentResponse]"
+},
+"PaginatedResponse_CompetencyResponse_": {
+"properties": {
+"items": {
+"items": {
+"$ref": "#/components/schemas/CompetencyResponse"
+},
+"type": "array",
+"title": "Items"
+},
+"total": {
+"type": "integer",
+"title": "Total"
+},
+"page": {
+"type": "integer",
+"title": "Page"
+},
+"page_size": {
+"type": "integer",
+"title": "Page Size"
+},
+"total_pages": {
+"type": "integer",
+"title": "Total Pages"
+}
+},
+"type": "object",
+"required": [
+"items",
+"total",
+"page",
+"page_size",
+"total_pages"
+],
+"title": "PaginatedResponse[CompetencyResponse]"
+},
+"PaginatedResponse_EmployeeResponse_": {
+"properties": {
+"items": {
+"items": {
+"$ref": "#/components/schemas/EmployeeResponse"
+},
+"type": "array",
+"title": "Items"
+},
+"total": {
+"type": "integer",
+"title": "Total"
+},
+"page": {
+"type": "integer",
+"title": "Page"
+},
+"page_size": {
+"type": "integer",
+"title": "Page Size"
+},
+"total_pages": {
+"type": "integer",
+"title": "Total Pages"
+}
+},
+"type": "object",
+"required": [
+"items",
+"total",
+"page",
+"page_size",
+"total_pages"
+],
+"title": "PaginatedResponse[EmployeeResponse]"
+},
+"PaginatedResponse_RoleResponse_": {
+"properties": {
+"items": {
+"items": {
+"$ref": "#/components/schemas/RoleResponse"
+},
+"type": "array",
+"title": "Items"
+},
+"total": {
+"type": "integer",
+"title": "Total"
+},
+"page": {
+"type": "integer",
+"title": "Page"
+},
+"page_size": {
+"type": "integer",
+"title": "Page Size"
+},
+"total_pages": {
+"type": "integer",
+"title": "Total Pages"
+}
+},
+"type": "object",
+"required": [
+"items",
+"total",
+"page",
+"page_size",
+"total_pages"
+],
+"title": "PaginatedResponse[RoleResponse]"
+},
+"RoleCompetencySuggestionsRequest": {
+"properties": {
+"role_name": {
+"type": "string",
+"title": "Role Name"
+},
+"role_description": {
+"type": "string",
+"title": "Role Description"
+},
+"department": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Department"
+}
+},
+"type": "object",
+"required": [
+"role_name",
+"role_description"
+],
+"title": "RoleCompetencySuggestionsRequest"
+},
+"RoleCompetencySuggestionsResponse": {
+"properties": {
+"suggestions": {
+"items": {
+"$ref": "#/components/schemas/CompetencySuggestion"
+},
+"type": "array",
+"title": "Suggestions"
+}
+},
+"type": "object",
+"required": [
+"suggestions"
+],
+"title": "RoleCompetencySuggestionsResponse"
+},
+"RoleCreate": {
+"properties": {
+"name": {
+"type": "string",
+"title": "Name"
+},
+"description": {
+"type": "string",
+"title": "Description"
+},
+"department": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Department"
+},
+"competency_requirements": {
+"items": {
+"$ref": "#/components/schemas/CompetencyRequirementCreate"
+},
+"type": "array",
+"title": "Competency Requirements",
+"default": []
+}
+},
+"type": "object",
+"required": [
+"name",
+"description"
+],
+"title": "RoleCreate"
+},
+"RoleReadiness": {
+"properties": {
+"role_id": {
+"type": "string",
+"title": "Role Id"
+},
+"role_name": {
+"type": "string",
+"title": "Role Name"
+},
+"total_employees": {
+"type": "integer",
+"title": "Total Employees"
+},
+"fully_qualified": {
+"type": "integer",
+"title": "Fully Qualified"
+},
+"partially_qualified": {
+"type": "integer",
+"title": "Partially Qualified"
+},
+"unqualified": {
+"type": "integer",
+"title": "Unqualified"
+},
+"average_readiness": {
+"type": "number",
+"title": "Average Readiness"
+}
+},
+"type": "object",
+"required": [
+"role_id",
+"role_name",
+"total_employees",
+"fully_qualified",
+"partially_qualified",
+"unqualified",
+"average_readiness"
+],
+"title": "RoleReadiness"
+},
+"RoleResponse": {
+"properties": {
+"id": {
+"type": "string",
+"title": "Id"
+},
+"name": {
+"type": "string",
+"title": "Name"
+},
+"description": {
+"type": "string",
+"title": "Description"
+},
+"department": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Department"
+},
+"competency_requirements": {
+"items": {
+"$ref": "#/components/schemas/CompetencyRequirementResponse"
+},
+"type": "array",
+"title": "Competency Requirements"
+},
+"created_at": {
+"type": "string",
+"format": "date-time",
+"title": "Created At"
+}
+},
+"type": "object",
+"required": [
+"id",
+"name",
+"description",
+"competency_requirements",
+"created_at"
+],
+"title": "RoleResponse"
+},
+"RoleUpdate": {
+"properties": {
+"name": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Name"
+},
+"description": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Description"
+},
+"department": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "null"
+}
+],
+"title": "Department"
+},
+"competency_requirements": {
+"anyOf": [
+{
+"items": {
+"$ref": "#/components/schemas/CompetencyRequirementCreate"
+},
+"type": "array"
+},
+{
+"type": "null"
+}
+],
+"title": "Competency Requirements"
+}
+},
+"type": "object",
+"title": "RoleUpdate"
+},
+"TeamAnalysis": {
+"properties": {
+"supervisor_id": {
+"type": "string",
+"title": "Supervisor Id"
+},
+"supervisor_name": {
+"type": "string",
+"title": "Supervisor Name"
+},
+"team_size": {
+"type": "integer",
+"title": "Team Size"
+},
+"team_readiness": {
+"type": "number",
+"title": "Team Readiness"
+},
+"members": {
+"items": {
+"$ref": "#/components/schemas/EmployeeGapAnalysis"
+},
+"type": "array",
+"title": "Members"
+}
+},
+"type": "object",
+"required": [
+"supervisor_id",
+"supervisor_name",
+"team_size",
+"team_readiness",
+"members"
+],
+"title": "TeamAnalysis"
+},
+"Token": {
+"properties": {
+"access_token": {
+"type": "string",
+"title": "Access Token"
+},
+"token_type": {
+"type": "string",
+"title": "Token Type",
+"default": "bearer"
+}
+},
+"type": "object",
+"required": [
+"access_token"
+],
+"title": "Token"
+},
+"UserCreate": {
+"properties": {
+"email": {
+"type": "string",
+"format": "email",
+"title": "Email"
+},
+"password": {
+"type": "string",
+"minLength": 8,
+"title": "Password"
+},
+"full_name": {
+"type": "string",
+"title": "Full Name"
+},
+"role": {
+"$ref": "#/components/schemas/UserRole",
+"default": "employee"
+}
+},
+"type": "object",
+"required": [
+"email",
+"password",
+"full_name"
+],
+"title": "UserCreate"
+},
+"UserResponse": {
+"properties": {
+"id": {
+"type": "string",
+"title": "Id"
+},
+"email": {
+"type": "string",
+"format": "email",
+"title": "Email"
+},
+"full_name": {
+"type": "string",
+"title": "Full Name"
+},
+"role": {
+"$ref": "#/components/schemas/UserRole"
+},
+"is_active": {
+"type": "boolean",
+"title": "Is Active",
+"default": true
+},
+"created_at": {
+"type": "string",
+"format": "date-time",
+"title": "Created At"
+}
+},
+"type": "object",
+"required": [
+"id",
+"email",
+"full_name",
+"role",
+"created_at"
+],
+"title": "UserResponse"
+},
+"UserRole": {
+"type": "string",
+"enum": [
+"admin",
+"manager",
+"employee"
+],
+"title": "UserRole"
+},
+"ValidationError": {
+"properties": {
+"loc": {
+"items": {
+"anyOf": [
+{
+"type": "string"
+},
+{
+"type": "integer"
+}
+]
+},
+"type": "array",
+"title": "Location"
+},
+"msg": {
+"type": "string",
+"title": "Message"
+},
+"type": {
+"type": "string",
+"title": "Error Type"
+},
+"input": {
+"title": "Input"
+},
+"ctx": {
+"type": "object",
+"title": "Context"
+}
+},
+"type": "object",
+"required": [
+"loc",
+"msg",
+"type"
+],
+"title": "ValidationError"
+}
+},
+"securitySchemes": {
+"OAuth2PasswordBearer": {
+"type": "oauth2",
+"flows": {
+"password": {
+"scopes": {},
+"tokenUrl": "/api/v1/auth/login"
+}
+}
+}
+}
+}
+}
