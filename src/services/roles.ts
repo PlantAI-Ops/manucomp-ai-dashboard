@@ -45,7 +45,13 @@ export interface RoleFormData {
 export interface CompetencyOption {
   id: string;
   name: string;
+  description: string;
   category: string;
+  displayCategory: string;
+  is_safety_critical: boolean;
+  detailed_description: string | null;
+  best_practices: string | null;
+  common_mistakes: string | null;
 }
 
 export interface CompetencySuggestion {
@@ -68,8 +74,22 @@ async function fetchRolesPaginated(filters: RoleFilters): Promise<RolePaginatedR
 }
 
 async function fetchCompetencies(): Promise<CompetencyOption[]> {
-  const { data } = await api.get<{ items: CompetencyOption[] }>("/competencies", { params: { page_size: 100 } });
-  return data.items;
+  const { data } = await api.get<{ items: Record<string, any>[] }>("/competencies", { params: { page_size: 100 } });
+  return data.items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description ?? "",
+    category: item.category ?? "",
+    displayCategory: titleCase(item.category ?? ""),
+    is_safety_critical: item.is_safety_critical ?? false,
+    detailed_description: item.detailed_description ?? null,
+    best_practices: item.best_practices ?? null,
+    common_mistakes: item.common_mistakes ?? null,
+  }));
+}
+
+function titleCase(str: string): string {
+  return str.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 async function createRole(body: RoleFormData) {
@@ -98,18 +118,18 @@ async function suggestCompetencies(body: { role_name: string; role_description: 
 
 // Mock data
 const MOCK_COMPETENCIES: CompetencyOption[] = [
-  { id: "comp-1", name: "CNC Programming", category: "Technical" },
-  { id: "comp-2", name: "Blueprint Reading", category: "Technical" },
-  { id: "comp-3", name: "Quality Inspection", category: "Quality" },
-  { id: "comp-4", name: "Safety Protocols", category: "Safety" },
-  { id: "comp-5", name: "Welding (MIG/TIG)", category: "Technical" },
-  { id: "comp-6", name: "Electrical Systems", category: "Technical" },
-  { id: "comp-7", name: "Hydraulic Systems", category: "Mechanical" },
-  { id: "comp-8", name: "PLC Programming", category: "Automation" },
-  { id: "comp-9", name: "Lean Manufacturing", category: "Process" },
-  { id: "comp-10", name: "Statistical Process Control", category: "Quality" },
-  { id: "comp-11", name: "Lockout/Tagout", category: "Safety" },
-  { id: "comp-12", name: "Forklift Operation", category: "Operations" },
+  { id: "comp-1", name: "CNC Programming", description: "Set up and operate CNC machines", category: "technical", displayCategory: "Technical", is_safety_critical: true, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-2", name: "Blueprint Reading", description: "Interpret engineering drawings", category: "technical", displayCategory: "Technical", is_safety_critical: false, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-3", name: "Quality Inspection", description: "Perform dimensional checks", category: "quality", displayCategory: "Quality", is_safety_critical: false, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-4", name: "Safety Protocols", description: "Workplace safety procedures", category: "safety", displayCategory: "Safety", is_safety_critical: true, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-5", name: "Welding (MIG/TIG)", description: "Metal joining techniques", category: "technical", displayCategory: "Technical", is_safety_critical: true, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-6", name: "Electrical Systems", description: "Industrial electrical work", category: "technical", displayCategory: "Technical", is_safety_critical: true, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-7", name: "Hydraulic Systems", description: "Hydraulic equipment maintenance", category: "process", displayCategory: "Process", is_safety_critical: true, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-8", name: "PLC Programming", description: "Programmable logic controllers", category: "technical", displayCategory: "Technical", is_safety_critical: false, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-9", name: "Lean Manufacturing", description: "Waste elimination and efficiency", category: "process", displayCategory: "Process", is_safety_critical: false, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-10", name: "Statistical Process Control", description: "SPC tools and techniques", category: "quality", displayCategory: "Quality", is_safety_critical: false, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-11", name: "Lockout/Tagout", description: "Equipment isolation procedures", category: "safety", displayCategory: "Safety", is_safety_critical: true, detailed_description: null, best_practices: null, common_mistakes: null },
+  { id: "comp-12", name: "Forklift Operation", description: "Powered industrial truck operation", category: "safety", displayCategory: "Safety", is_safety_critical: true, detailed_description: null, best_practices: null, common_mistakes: null },
 ];
 
 const DEPARTMENTS = ["Assembly", "Quality", "Welding", "CNC", "Maintenance", "Safety"];

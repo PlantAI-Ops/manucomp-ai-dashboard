@@ -10,7 +10,7 @@ interface CompetencyTabProps {
 }
 
 export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employee }) => {
-  const { competency_summary: summary, competencies } = employee;
+  const { competency_summary: summary = { total: 0, assessed: 0, gaps: 0, readiness_percentage: 0 }, competencies = [] } = employee;
 
   const readinessColor =
     summary.readiness_percentage >= 80

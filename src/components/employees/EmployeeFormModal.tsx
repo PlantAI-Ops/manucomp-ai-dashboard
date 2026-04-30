@@ -38,7 +38,7 @@ const employeeSchema = z.object({
   email: z.string().trim().email("Valid email is required"),
   role_id: z.string().min(1, "Role is required"),
   supervisor_id: z.string().nullable(),
-  department: z.string().min(1, "Department is required"),
+  department_id: z.string().min(1, "Department is required"),
   hire_date: z.string().min(1, "Hire date is required"),
 });
 
@@ -61,7 +61,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
   const { data: apiEmployees = [] } = useEmployeesForSelect();
   const { data: apiDepartments } = useDepartments();
   const roles: RoleOption[] = apiRoles ?? MOCK_ROLES;
-  const departments = apiDepartments?.map(d => d.name) ?? [];
+  const departments = apiDepartments ?? [];
 
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -71,7 +71,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
     email: "",
     role_id: "",
     supervisor_id: null,
-    department: "",
+    department_id: "",
     hire_date: "",
   });
 
@@ -84,7 +84,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
           email: employee.email,
           role_id: employee.role_id,
           supervisor_id: employee.supervisor_id,
-          department: employee.department,
+          department_id: employee.department_id || "",
           hire_date: employee.hire_date,
         });
       } else {
@@ -94,7 +94,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
           email: "",
           role_id: "",
           supervisor_id: null,
-          department: "",
+          department_id: "",
           hire_date: "",
         });
       }
@@ -125,7 +125,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
         full_name: form.full_name,
         email: form.email,
         role_id: form.role_id,
-        department: form.department,
+        department_id: form.department_id,
       };
 
       if (form.supervisor_id && !isMockId(form.supervisor_id)) {
@@ -225,17 +225,17 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
           </div>
           <div className="grid gap-1.5">
             <Label>Department *</Label>
-            <Select value={form.department} onValueChange={(v) => handleChange("department", v)}>
-              <SelectTrigger className={cn("bg-muted/50 border-border/50 rounded-input", errors.department && "border-destructive")}>
+            <Select value={form.department_id} onValueChange={(v) => handleChange("department_id", v)}>
+              <SelectTrigger className={cn("bg-muted/50 border-border/50 rounded-input", errors.department_id && "border-destructive")}>
                 <SelectValue placeholder="Select department" />
               </SelectTrigger>
               <SelectContent>
                 {departments.map((d) => (
-                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                  <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.department && <p className="text-xs text-destructive">{errors.department}</p>}
+            {errors.department_id && <p className="text-xs text-destructive">{errors.department_id}</p>}
           </div>
         </div>
 
