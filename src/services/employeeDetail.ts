@@ -22,6 +22,7 @@ export interface EmployeeDetail {
   supervisor_id: string | null;
   supervisor_name: string | null;
   department: string;
+  department_id: string | null;
   hire_date: string;
   is_active: boolean;
   created_at: string;
@@ -97,6 +98,7 @@ export function buildMockEmployeeDetail(id: string): EmployeeDetail {
     supervisor_id: idx > 0 ? "emp-1" : null,
     supervisor_name: idx > 0 ? NAMES[0] : null,
     department: DEPARTMENTS[idx % 6],
+    department_id: `dept-${(idx % 6) + 1}`,
     hire_date: new Date(2020 + Math.floor(idx / 12), idx % 12, 1 + (idx % 28)).toISOString().split("T")[0],
     is_active: idx % 9 !== 0,
     created_at: new Date().toISOString(),
@@ -151,7 +153,28 @@ export async function fetchAssessments(employeeId: string): Promise<AssessmentRe
 
 export async function generateAiInsight(employeeId: string): Promise<AiInsightResponse> {
   const { data } = await api.post<AiInsightResponse>("/ai/insight", { employee_id: employeeId });
-  return data;
+
+  // Normalize priority_actions: backend returns strings, frontend expects objects
+  const normalizedPriorityActions = (data.priority_actions ?? []).map((item) => {
+    if (typeof item === "string") {
+      // Infer severity from keywords in the action text
+      const lower = item.toLowerCase();
+      const severity: "critical" | "high" | "medium" =
+        lower.includes("critical") || lower.includes("immediate")
+          ? "critical"
+          : lower.includes("high") || lower.includes("urgent")
+          ? "high"
+          : "medium";
+      return { action: item, severity };
+    }
+    return item as { action: string; severity: "critical" | "high" | "medium" };
+  });
+
+  return {
+    summary: data.summary ?? "",
+    recommendations: data.recommendations ?? [],
+    priority_actions: normalizedPriorityActions,
+  };
 }
 
 export function useEmployeeDetail(id: string) {
