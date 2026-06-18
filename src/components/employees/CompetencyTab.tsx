@@ -2,15 +2,28 @@ import { LevelIndicator } from "@/components/LevelIndicator";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Progress } from "@/components/ui/progress";
 import { AlertTriangle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import type { EmployeeDetail } from "@/services/employeeDetail";
+import { useEmployeeCompetencyHistory } from "@/services/employeeDetail";
+import type { EmployeeCompetencyHistoryItem } from "@/services/employeeDetail";
 
 interface CompetencyTabProps {
-  employee: EmployeeDetail;
+  employeeId: string;
 }
 
-export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employee }) => {
-  const { competency_summary: summary = { total: 0, assessed: 0, gaps: 0, readiness_percentage: 0 }, competencies = [] } = employee;
+export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employeeId }) => {
+  const { data: history, isLoading, isError } = useEmployeeCompetencyHistory(employeeId);
+
+  const competencies: EmployeeCompetencyHistoryItem[] = history?.competencies ?? [];
+
+  const summary = {
+    total: competencies.length,
+    assessed: competencies.filter((c) => c.latest_assessed_level !== null).length,
+    gaps: competencies.filter((c) => c.gap > 0).length,
+    readiness_percentage: competencies.length > 0
+      ? Math.round(((competencies.length - competencies.filter((c) => c.gap > 0).length) / competencies.length) * 100)
+      : 0,
+  };
 
   const readinessColor =
     summary.readiness_percentage >= 80
@@ -68,18 +81,29 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employee }) => {
               </tr>
             </thead>
             <tbody>
-              {competencies.map((comp) => (
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-border/30">
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-3/4" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/2" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/4" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/4" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/4" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/4" /></td>
+                  </tr>
+                ))
+              ) : competencies.map((comp) => (
                 <tr key={comp.competency_id} className="border-b border-border/30 last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 font-medium">{comp.competency_name}</td>
                   <td className="px-4 py-3">
                     <StatusBadge variant="neutral">{comp.category}</StatusBadge>
                   </td>
                   <td className="px-4 py-3">
-                    <LevelIndicator level={comp.required_level} size="sm" />
+                    <LevelIndicator level={comp.required_level ?? 0} size="sm" />
                   </td>
                   <td className="px-4 py-3">
-                    {comp.assessed_level !== null ? (
-                      <LevelIndicator level={comp.assessed_level} size="sm" />
+                    {comp.latest_assessed_level !== null ? (
+                      <LevelIndicator level={comp.latest_assessed_level} size="sm" />
                     ) : (
                       <span className="text-xs text-muted-foreground italic">Not Assessed</span>
                     )}
@@ -99,7 +123,7 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employee }) => {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {comp.safety_critical && (
+                    {comp.is_safety_critical && (
                       <AlertTriangle className="h-4 w-4 text-warning" />
                     )}
                   </td>

@@ -179,7 +179,7 @@ const EmployeeDetailPage = () => {
           </TabsList>
 
           <TabsContent value="competencies">
-            <CompetencyTab employee={employee} />
+            <CompetencyTab employeeId={employee.id} />
           </TabsContent>
 
           <TabsContent value="assessments">

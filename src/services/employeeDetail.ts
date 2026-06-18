@@ -12,6 +12,28 @@ export interface CompetencySummaryItem {
   safety_critical: boolean;
 }
 
+export interface EmployeeCompetencyHistoryItem {
+  competency_id: string;
+  competency_name: string;
+  category: string;
+  is_safety_critical: boolean;
+  latest_assessed_level: number | null;
+  latest_assessment_id: string | null;
+  latest_assessed_at: string | null;
+  required_level: number | null;
+  gap: number;
+}
+
+export interface EmployeeCompetencyHistoryResponse {
+  employee_id: string;
+  employee_name: string;
+  role_name: string;
+  department: string;
+  assessments: unknown[];
+  competencies: EmployeeCompetencyHistoryItem[];
+  total_assessments: number;
+}
+
 export interface EmployeeDetail {
   id: string;
   employee_number: string;
@@ -121,6 +143,47 @@ export function buildMockAssessments(employeeId: string): AssessmentRecord[] {
   }));
 }
 
+export function buildMockEmployeeCompetencyHistory(
+  employeeId: string
+): EmployeeCompetencyHistoryResponse {
+  const idx = parseInt(employeeId.replace("emp-", ""), 10) - 1;
+  const NAMES = [
+    "John Martinez", "Sarah Chen", "Mike Johnson", "Lisa Park", "David Brown",
+    "Emily Wilson", "Carlos Rivera", "Amy Thompson", "James Lee", "Maria Garcia",
+  ];
+  const ROLES = ["CNC Operator", "Quality Inspector", "Welder", "Assembly Tech", "Maintenance Tech", "Safety Officer"];
+  const DEPARTMENTS = ["Assembly", "Quality", "Welding", "CNC", "Maintenance", "Safety"];
+
+  const competencies: EmployeeCompetencyHistoryItem[] = COMPETENCY_NAMES.map((c, i) => {
+    const required = Math.floor(Math.random() * 3) + 3;
+    const assessed = Math.random() > 0.2 ? Math.floor(Math.random() * 5) + 1 : null;
+    const gap = assessed !== null ? Math.max(0, required - assessed) : required;
+    return {
+      competency_id: `comp-${i + 1}`,
+      competency_name: c,
+      category: CATEGORIES[i],
+      is_safety_critical: i === 8 || i === 9,
+      latest_assessed_level: assessed,
+      latest_assessment_id: assessed ? `assess-${i + 1}` : null,
+      latest_assessed_at: assessed ? new Date(2024, i % 12, 1 + (i % 28)).toISOString() : null,
+      required_level: required,
+      gap,
+    };
+  });
+
+  const totalAssessments = competencies.filter((c) => c.latest_assessed_level !== null).length;
+
+  return {
+    employee_id: employeeId,
+    employee_name: NAMES[idx % NAMES.length] || "Employee",
+    role_name: ROLES[idx % 6],
+    department: DEPARTMENTS[idx % 6],
+    assessments: [],
+    competencies,
+    total_assessments: totalAssessments,
+  };
+}
+
 export const MOCK_AI_INSIGHT: AiInsightResponse = {
   summary:
     "This employee shows strong technical aptitude in core machining competencies but has critical gaps in safety procedures that require immediate attention. Overall readiness is trending positively with consistent improvement over the past quarter.",
@@ -163,8 +226,8 @@ export async function generateAiInsight(employeeId: string): Promise<AiInsightRe
         lower.includes("critical") || lower.includes("immediate")
           ? "critical"
           : lower.includes("high") || lower.includes("urgent")
-          ? "high"
-          : "medium";
+            ? "high"
+            : "medium";
       return { action: item, severity };
     }
     return item as { action: string; severity: "critical" | "high" | "medium" };
@@ -174,6 +237,29 @@ export async function generateAiInsight(employeeId: string): Promise<AiInsightRe
     summary: data.summary ?? "",
     recommendations: data.recommendations ?? [],
     priority_actions: normalizedPriorityActions,
+  };
+}
+
+export async function fetchEmployeeCompetencyHistory(
+  employeeId: string
+): Promise<EmployeeCompetencyHistoryResponse> {
+  const { data } = await api.get<EmployeeCompetencyHistoryResponse>(
+    `/assessments/employee/${employeeId}/history`
+  );
+  return data;
+}
+
+export function useEmployeeCompetencyHistory(employeeId: string) {
+  const query = useQuery({
+    queryKey: ["employee-competency-history", employeeId],
+    queryFn: () => fetchEmployeeCompetencyHistory(employeeId),
+    enabled: !isMockId(employeeId),
+    retry: false,
+  });
+
+  return {
+    ...query,
+    isMock: isMockId(employeeId),
   };
 }
 
