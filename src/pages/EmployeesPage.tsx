@@ -80,12 +80,6 @@ const EmployeesPage = () => {
   const { data: apiData, isLoading, isError } = useEmployees(filters);
   const { data: apiRoles } = useRoles();
 
-  // Debug: log first employee to see actual fields
-  if (apiData?.items?.[0]) {
-    console.log('Employee sample:', apiData.items[0]);
-    console.log('Department field:', apiData.items[0].department, 'department_name:', apiData.items[0].department_name);
-  }
-
   const useMock = isError || !apiData;
   const roles = apiRoles ?? MOCK_ROLES;
 

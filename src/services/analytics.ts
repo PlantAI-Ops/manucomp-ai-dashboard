@@ -359,7 +359,6 @@ async function fetchTeamAnalysis(params: { manager_id?: string; department?: str
 
 async function fetchAiOrgInsights(): Promise<AiOrgInsightsResponse> {
   const { data } = await api.get<AiOrgInsightsResponse>("/ai/org-insights", { timeout: 120_000 });
-  console.log('AI Org Insights response:', data);
   return data;
 }
 
