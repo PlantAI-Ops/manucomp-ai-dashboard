@@ -20,6 +20,10 @@ import {
 } from "@/services/dashboard";
 import { useAiOrgInsights, type AiOrgInsightsResponse, type CriticalGapDetail } from "@/services/analytics";
 
+function getGapValue(gap: CriticalGapDetail): number {
+  return gap.gap ?? gap.gap_level ?? gap.gap_size ?? gap.level_gap ?? 0;
+}
+
 const DashboardPage = () => {
   const { data, isLoading, isError } = useQuery<DashboardSummary>({
     queryKey: ["dashboard-summary"],
@@ -236,7 +240,7 @@ const DashboardPage = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground">Gap: {gap.gap}</span>
+                    <span className="text-xs text-muted-foreground">Gap: {getGapValue(gap)}</span>
                     <StatusBadge variant={gap.severity === "critical" ? "danger" : "warning"}>
                       {gap.severity}
                     </StatusBadge>
@@ -261,7 +265,7 @@ const DashboardPage = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground">Gap: {gap.gap}</span>
+                    <span className="text-xs text-muted-foreground">Gap: {getGapValue(gap)}</span>
                     <StatusBadge variant={gap.severity === "critical" ? "danger" : "warning"}>
                       {gap.severity}
                     </StatusBadge>

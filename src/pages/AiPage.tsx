@@ -13,6 +13,10 @@ import { Sparkles, AlertTriangle, Lightbulb, TrendingUp, Users, Briefcase, Zap, 
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAiOrgInsights, type AiOrgInsightsResponse, type TrainingRecommendation, type ReadinessSummary, type WorkforceReadinessReport, type CriticalGapDetail } from "@/services/analytics";
+
+function getGapValue(gap: CriticalGapDetail): number {
+  return gap.gap ?? gap.gap_level ?? gap.gap_size ?? gap.level_gap ?? 0;
+}
 import { useAuth } from "@/hooks/useAuth";
 import ReactMarkdown from "react-markdown";
 
@@ -266,10 +270,10 @@ function InsightsTab({ data, isLoading, error }: { data: AiOrgInsightsResponse |
                   {gap.role_name && <span className="text-muted-foreground text-xs">({gap.role_name})</span>}
                   <span className="text-muted-foreground text-xs truncate">{gap.competency_name}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="destructive" className="text-xs">Gap: {gap.gap}</Badge>
-                  <Badge variant="destructive" className="text-xs">Critical</Badge>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="destructive" className="text-xs">Gap: {getGapValue(gap)}</Badge>
+                    <Badge variant="destructive" className="text-xs">Critical</Badge>
+                  </div>
               </div>
             ))}
           </CardContent>
@@ -292,10 +296,10 @@ function InsightsTab({ data, isLoading, error }: { data: AiOrgInsightsResponse |
                   {gap.role_name && <span className="text-muted-foreground text-xs">({gap.role_name})</span>}
                   <span className="text-muted-foreground text-xs truncate">{gap.competency_name}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">Gap: {gap.gap}</Badge>
-                  <Badge variant="secondary" className="text-xs">High</Badge>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">Gap: {getGapValue(gap)}</Badge>
+                    <Badge variant="secondary" className="text-xs">High</Badge>
+                  </div>
               </div>
             ))}
           </CardContent>

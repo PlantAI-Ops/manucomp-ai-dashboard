@@ -118,7 +118,10 @@ export interface WorkforceReadinessReport {
 export interface CriticalGapDetail {
   employee_name: string;
   competency_name: string;
-  gap: number;
+  gap?: number;
+  gap_level?: number;
+  gap_size?: number;
+  level_gap?: number;
   severity: "critical" | "high";
   role_name?: string;
 }
