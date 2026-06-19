@@ -115,6 +115,14 @@ export interface WorkforceReadinessReport {
   executive_summary: string;
 }
 
+export interface CriticalGapDetail {
+  employee_name: string;
+  competency_name: string;
+  gap: number;
+  severity: "critical" | "high";
+  role_name?: string;
+}
+
 export interface AiOrgInsightsResponse {
   workforce_summary: string;
   top_gap_analysis: string;
@@ -122,6 +130,8 @@ export interface AiOrgInsightsResponse {
   training_recommendations: TrainingRecommendation[];
   workforce_readiness_report: WorkforceReadinessReport;
   competency_trends: CompetencyTrends;
+  critical_gap_details?: CriticalGapDetail[];
+  high_gap_details?: CriticalGapDetail[];
 }
 
 // --- Mock Data ---
@@ -349,6 +359,7 @@ async function fetchTeamAnalysis(params: { manager_id?: string; department?: str
 
 async function fetchAiOrgInsights(): Promise<AiOrgInsightsResponse> {
   const { data } = await api.get<AiOrgInsightsResponse>("/ai/org-insights", { timeout: 120_000 });
+  console.log('AI Org Insights response:', data);
   return data;
 }
 

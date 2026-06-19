@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, AlertTriangle, Lightbulb, TrendingUp, Users, Briefcase, Zap, Info, BarChart3, Loader2, RefreshCw, Target, Shield, BookOpen, TrendingDown, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useAiOrgInsights, type AiOrgInsightsResponse, type TrainingRecommendation, type ReadinessSummary, type WorkforceReadinessReport } from "@/services/analytics";
+import { useAiOrgInsights, type AiOrgInsightsResponse, type TrainingRecommendation, type ReadinessSummary, type WorkforceReadinessReport, type CriticalGapDetail } from "@/services/analytics";
 import { useAuth } from "@/hooks/useAuth";
 import ReactMarkdown from "react-markdown";
 
@@ -249,6 +249,58 @@ function InsightsTab({ data, isLoading, error }: { data: AiOrgInsightsResponse |
           </CardContent>
         </Card>
       </div>
+
+      {data.critical_gap_details && data.critical_gap_details.length > 0 && (
+        <Card className="glass border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-destructive" />
+              Critical Gaps
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {data.critical_gap_details.map((gap, i) => (
+              <div key={i} className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg border border-destructive/20 bg-destructive/5">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="font-medium text-sm truncate">{gap.employee_name}</span>
+                  {gap.role_name && <span className="text-muted-foreground text-xs">({gap.role_name})</span>}
+                  <span className="text-muted-foreground text-xs truncate">{gap.competency_name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="destructive" className="text-xs">Gap: {gap.gap}</Badge>
+                  <Badge variant="destructive" className="text-xs">Critical</Badge>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {data.high_gap_details && data.high_gap_details.length > 0 && (
+        <Card className="glass border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-warning" />
+              High Gaps
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {data.high_gap_details.map((gap, i) => (
+              <div key={i} className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg border border-warning/20 bg-warning/5">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="font-medium text-sm truncate">{gap.employee_name}</span>
+                  {gap.role_name && <span className="text-muted-foreground text-xs">({gap.role_name})</span>}
+                  <span className="text-muted-foreground text-xs truncate">{gap.competency_name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">Gap: {gap.gap}</Badge>
+                  <Badge variant="secondary" className="text-xs">High</Badge>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="glass border-border/50">
         <CardHeader>
