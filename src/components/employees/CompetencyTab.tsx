@@ -4,21 +4,18 @@ import { Progress } from "@/components/ui/progress";
 import { AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useEmployeeCompetencyHistory } from "@/services/employeeDetail";
-import type { EmployeeCompetencyHistoryItem } from "@/services/employeeDetail";
+import type { CompetencySummaryItem } from "@/services/employeeDetail";
 
 interface CompetencyTabProps {
-  employeeId: string;
+  competencies: CompetencySummaryItem[];
+  isLoading?: boolean;
 }
 
-export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employeeId }) => {
-  const { data: history, isLoading, isError } = useEmployeeCompetencyHistory(employeeId);
-
-  const competencies: EmployeeCompetencyHistoryItem[] = history?.competencies ?? [];
+export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies, isLoading }) => {
 
   const summary = {
     total: competencies.length,
-    assessed: competencies.filter((c) => c.latest_assessed_level !== null).length,
+    assessed: competencies.filter((c) => c.assessed_level !== null).length,
     gaps: competencies.filter((c) => c.gap > 0).length,
     readiness_percentage: competencies.length > 0
       ? Math.round(((competencies.length - competencies.filter((c) => c.gap > 0).length) / competencies.length) * 100)
@@ -102,8 +99,8 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employeeId }) => {
                     <LevelIndicator level={comp.required_level ?? 0} size="sm" />
                   </td>
                   <td className="px-4 py-3">
-                    {comp.latest_assessed_level !== null ? (
-                      <LevelIndicator level={comp.latest_assessed_level} size="sm" />
+                    {comp.assessed_level !== null ? (
+                      <LevelIndicator level={comp.assessed_level} size="sm" />
                     ) : (
                       <span className="text-xs text-muted-foreground italic">Not Assessed</span>
                     )}
@@ -123,7 +120,7 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employeeId }) => {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {comp.is_safety_critical && (
+                    {comp.safety_critical && (
                       <AlertTriangle className="h-4 w-4 text-warning" />
                     )}
                   </td>
