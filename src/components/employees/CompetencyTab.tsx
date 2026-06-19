@@ -6,35 +6,31 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { CompetencySummaryItem } from "@/services/employeeDetail";
 
+interface CompetencySummary {
+  total_required: number;
+  assessed: number;
+  gaps: number;
+}
+
 interface CompetencyTabProps {
   competencies: CompetencySummaryItem[];
+  summary?: CompetencySummary;
   isLoading?: boolean;
 }
 
-export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [], isLoading }) => {
+export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [], summary, isLoading }) => {
 
-  const summary = {
-    total: competencies.length,
+  const readinessPercentage = summary?.total_required 
+    ? Math.round(((summary.total_required - summary.gaps) / summary.total_required) * 100)
+    : competencies.length > 0
+      ? Math.round(((competencies.length - competencies.filter((c) => c.gap > 0).length) / competencies.length) * 100)
+      : 0;
+
+  const displaySummary = summary || {
+    total_required: competencies.length,
     assessed: competencies.filter((c) => c.assessed_level !== null).length,
     gaps: competencies.filter((c) => c.gap > 0).length,
-    readiness_percentage: competencies.length > 0
-      ? Math.round(((competencies.length - competencies.filter((c) => c.gap > 0).length) / competencies.length) * 100)
-      : 0,
   };
-
-  const readinessColor =
-    summary.readiness_percentage >= 80
-      ? "text-success"
-      : summary.readiness_percentage >= 50
-        ? "text-warning"
-        : "text-destructive";
-
-  const progressColor =
-    summary.readiness_percentage >= 80
-      ? "[&>div]:bg-success"
-      : summary.readiness_percentage >= 50
-        ? "[&>div]:bg-warning"
-        : "[&>div]:bg-destructive";
 
   return (
     <div className="space-y-6">
@@ -42,23 +38,23 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [],
       <div className="glass rounded-card p-5">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           <div className="text-center">
-            <p className="text-2xl font-bold">{summary.total}</p>
+            <p className="text-2xl font-bold">{displaySummary.total_required}</p>
             <p className="text-xs text-muted-foreground">Total Required</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold">{summary.assessed}</p>
+            <p className="text-2xl font-bold">{displaySummary.assessed}</p>
             <p className="text-xs text-muted-foreground">Assessed</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-destructive">{summary.gaps}</p>
+            <p className="text-2xl font-bold text-destructive">{displaySummary.gaps}</p>
             <p className="text-xs text-muted-foreground">Gaps</p>
           </div>
           <div className="text-center">
             <p className={cn("text-2xl font-bold", readinessColor)}>
-              {summary.readiness_percentage}%
+              {readinessPercentage}%
             </p>
             <p className="text-xs text-muted-foreground mb-2">Readiness</p>
-            <Progress value={summary.readiness_percentage} className={cn("h-2", progressColor)} />
+            <Progress value={readinessPercentage} className={cn("h-2", progressColor)} />
           </div>
         </div>
       </div>

@@ -45,14 +45,14 @@ export interface EmployeeDetail {
   supervisor_name: string | null;
   department: string;
   department_id: string | null;
+  department_name?: string;
   hire_date: string;
   is_active: boolean;
   created_at: string;
   competency_summary: {
-    total: number;
+    total_required: number;
     assessed: number;
     gaps: number;
-    readiness_percentage: number;
   };
   competencies: CompetencySummaryItem[];
 }
