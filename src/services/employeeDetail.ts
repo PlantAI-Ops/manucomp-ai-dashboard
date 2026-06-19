@@ -264,6 +264,7 @@ export function useEmployeeCompetencyHistory(employeeId: string) {
     queryFn: () => fetchEmployeeCompetencyHistory(employeeId),
     enabled: !isMockId(employeeId),
     retry: false,
+    throwOnError: false,
   });
 
   return {

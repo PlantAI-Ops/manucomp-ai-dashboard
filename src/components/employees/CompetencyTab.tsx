@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useEmployeeCompetencyHistory } from "@/services/employeeDetail";
+import { useEmployeeCompetencyHistory, buildMockEmployeeCompetencyHistory } from "@/services/employeeDetail";
 import type { EmployeeCompetencyHistoryItem } from "@/services/employeeDetail";
 
 interface CompetencyTabProps {
@@ -14,7 +14,10 @@ interface CompetencyTabProps {
 export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employeeId }) => {
   const { data: history, isLoading, isError } = useEmployeeCompetencyHistory(employeeId);
 
-  const competencies: EmployeeCompetencyHistoryItem[] = history?.competencies ?? [];
+  const useMock = isError || !history;
+  const competencies: EmployeeCompetencyHistoryItem[] = useMock
+    ? buildMockEmployeeCompetencyHistory(employeeId).competencies
+    : history?.competencies ?? [];
 
   const summary = {
     total: competencies.length,
