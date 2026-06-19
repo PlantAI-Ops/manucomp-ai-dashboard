@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, AlertTriangle, Lightbulb, TrendingUp, Users, Briefcase, Zap, Info, BarChart3, Loader2, RefreshCw, Target, Shield, BookOpen, TrendingDown, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useAiOrgInsights, type AiOrgInsightsResponse, type TrainingRecommendation, type ReadinessSummary } from "@/services/analytics";
+import { useAiOrgInsights, type AiOrgInsightsResponse, type TrainingRecommendation, type ReadinessSummary, type WorkforceReadinessReport } from "@/services/analytics";
 import { useAuth } from "@/hooks/useAuth";
 import ReactMarkdown from "react-markdown";
 
@@ -60,13 +60,18 @@ function parseTopGapAnalysis(text: string) {
 function transformTrainingRecommendations(recs: TrainingRecommendation[]) {
   return recs.map((r, i) => {
     const impactStr = String(r.estimated_impact || "");
+    const participantMatch = impactStr.match(/(\d+)\s*(?:employees?|people|participants?)/i);
+    const participants = participantMatch ? parseInt(participantMatch[1], 10) : 0;
     return {
       id: i + 1,
       name: r.title,
       target: r.target_gaps.join(", "),
-      participants: parseInt(impactStr.replace(/\D/g, "")) || 0,
+      participants,
       priority: r.priority,
       duration: r.category === "safety" ? "3 days" : r.category === "technical" ? "1 week" : "5 days",
+      description: r.description,
+      category: r.category,
+      estimatedImpact: r.estimated_impact,
     };
   });
 }
@@ -77,6 +82,9 @@ function transformDepartmentInsights(readinessSummaries: ReadinessSummary[]) {
     readiness: Math.round(r.readiness_percentage),
     topGap: r.status_summary.match(/gap in (?:this|these) (?:area|areas)[^.]*\.?/i)?.[0]?.replace(/gap in (?:this|these) (?:area|areas) /i, "")?.replace(".", "") || "Multiple gaps",
     employees_affected: r.total_employees,
+    fully_qualified: r.fully_qualified || 0,
+    partially_qualified: r.partially_qualified || 0,
+    unqualified: r.unqualified || 0,
   }));
 }
 
@@ -136,9 +144,18 @@ function InsightsTab({ data, isLoading, error }: { data: AiOrgInsightsResponse |
 
   const overallReadiness = Math.round(report.readiness_score);
   const criticalGaps = report.critical_gaps;
+  
+  // Calculate total employees and fully qualified from readiness summaries
   const totalEmployees = data.readiness_summaries.reduce((sum, r) => sum + r.total_employees, 0);
-  const trainingNeeded = data.training_recommendations.reduce((sum, t) => sum + (parseInt(t.estimated_impact.replace(/\D/g, "")) || 0), 0);
-  const certifiedPercentage = overallReadiness;
+  const fullyQualified = data.readiness_summaries.reduce((sum, r) => sum + (r.fully_qualified || 0), 0);
+  const partiallyQualified = data.readiness_summaries.reduce((sum, r) => sum + (r.partially_qualified || 0), 0);
+  const unqualified = data.readiness_summaries.reduce((sum, r) => sum + (r.unqualified || 0), 0);
+  
+  // Need Training = employees with gaps (partially qualified + unqualified)
+  const trainingNeeded = partiallyQualified + unqualified;
+  
+  // Certified = percentage of fully qualified employees
+  const certifiedPercentage = totalEmployees > 0 ? Math.round((fullyQualified / totalEmployees) * 100) : 0;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -354,13 +371,21 @@ function TrainingTab({ data, isLoading }: { data: AiOrgInsightsResponse | undefi
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mb-2">{training.target}</p>
+                  {training.description && (
+                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{training.description}</p>
+                  )}
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <Users className="h-3 w-3" /> {training.participants} participants
+                      <Users className="h-3 w-3" /> {training.participants || "N/A"} participants
                     </span>
                     <span className="flex items-center gap-1">
                       <BarChart3 className="h-3 w-3" /> {training.duration}
                     </span>
+                    {training.estimatedImpact && (
+                      <span className="flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3" /> {training.estimatedImpact}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <Button variant="outline" size="sm">
@@ -417,9 +442,16 @@ function DepartmentTab({ data, isLoading }: { data: AiOrgInsightsResponse | unde
                   {dept.readiness}% Ready
                 </Badge>
               </div>
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-4 text-xs text-muted-foreground mb-2">
                 <span>Top Gap: <strong>{dept.topGap}</strong></span>
-                <span>{dept.employees_affected} employees affected</span>
+                <span>{dept.employees_affected} employees</span>
+                {dept.fully_qualified !== undefined && (
+                  <>
+                    <span className="text-success">✓ {dept.fully_qualified} Certified</span>
+                    <span className="text-warning">{dept.partially_qualified} Need Training</span>
+                    <span className="text-destructive">{dept.unqualified} Unqualified</span>
+                  </>
+                )}
               </div>
               <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
                 <div

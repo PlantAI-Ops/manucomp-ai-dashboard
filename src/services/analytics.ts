@@ -75,6 +75,9 @@ export interface ReadinessSummary {
   total_employees: number;
   readiness_percentage: number;
   status_summary: string;
+  fully_qualified?: number;
+  partially_qualified?: number;
+  unqualified?: number;
 }
 
 export interface TrainingRecommendation {
