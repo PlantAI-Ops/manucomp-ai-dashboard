@@ -213,7 +213,7 @@ const RoleDetailPage = () => {
                       </td>
                       <td className="px-5 py-3 font-mono text-xs">{emp.employee_number}</td>
                       <td className="px-5 py-3">
-                        <StatusBadge variant="neutral">{emp.department}</StatusBadge>
+                        <StatusBadge variant="neutral">{emp.department_name || emp.department}</StatusBadge>
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 min-w-[120px]">
