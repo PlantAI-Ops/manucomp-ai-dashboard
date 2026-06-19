@@ -37,6 +37,18 @@ export interface RoleReadinessItem {
   average_readiness: number;
 }
 
+// --- Dashboard Summary ---
+export interface DashboardSummary {
+  total_employees: number;
+  total_roles: number;
+  total_competencies: number;
+  assessed_employees: number;
+  assessment_percentage: number;
+  critical_gaps: number;
+  role_readiness: RoleReadinessItem[];
+  top_skill_gaps: Array<Record<string, unknown>>;
+}
+
 // --- Team Analysis ---
 export interface TeamMemberGap {
   competency_id: string;
@@ -313,9 +325,21 @@ async function fetchGapAnalysis(employeeId: string): Promise<GapAnalysis> {
   return data;
 }
 
-async function fetchRoleReadiness(): Promise<RoleReadinessItem[]> {
-  const { data } = await api.get<RoleReadinessItem[]>("/analytics/role-readiness");
+async function fetchDashboardSummary(): Promise<DashboardSummary> {
+  const { data } = await api.get<DashboardSummary>("/analytics/dashboard-summary");
   return data;
+}
+
+async function fetchRoleReadiness(): Promise<RoleReadinessItem[]> {
+  const [summary, rolesRes] = await Promise.all([
+    fetchDashboardSummary(),
+    api.get<{ items: { id: string; name: string; department: string }[] }>("/roles", { params: { page_size: 100 } }),
+  ]);
+  const roleDeptMap = new Map(rolesRes.data.items.map(r => [r.id, r.department]));
+  return (summary.role_readiness || []).map(r => ({
+    ...r,
+    department: roleDeptMap.get(r.role_id) || "Unknown",
+  }));
 }
 
 async function fetchTeamAnalysis(params: { manager_id?: string; department?: string }): Promise<TeamAnalysis> {
