@@ -11,7 +11,7 @@ interface CompetencyTabProps {
   isLoading?: boolean;
 }
 
-export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies, isLoading }) => {
+export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [], isLoading }) => {
 
   const summary = {
     total: competencies.length,
