@@ -18,6 +18,7 @@ import {
   MOCK_DASHBOARD,
   type DashboardSummary,
 } from "@/services/dashboard";
+import { useAiOrgInsights, type AiOrgInsightsResponse } from "@/services/analytics";
 
 const DashboardPage = () => {
   const { data, isLoading, isError } = useQuery<DashboardSummary>({
@@ -26,8 +27,13 @@ const DashboardPage = () => {
     retry: false,
   });
 
+  const { data: aiData } = useAiOrgInsights({ enabled: true });
+
   const useMock = isError || !data;
   const summary = data ?? MOCK_DASHBOARD;
+
+  // Override critical gaps with AI insights if available
+  const criticalGaps = aiData?.workforce_readiness_report?.critical_gaps ?? summary.critical_gaps;
 
   return (
     <AppLayout>
@@ -194,7 +200,7 @@ const DashboardPage = () => {
             Critical Gaps
           </CardTitle>
           <Badge variant="destructive" className="text-xs">
-            {summary.critical_gap_details?.length ?? 0} issues
+            {criticalGaps} critical gaps
           </Badge>
         </CardHeader>
         <CardContent>
