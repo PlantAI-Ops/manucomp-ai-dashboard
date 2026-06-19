@@ -18,6 +18,7 @@ import {
 import {
   useDepartments, useCreateDepartment, useUpdateDepartment, useDeleteDepartment,
   type Department, type DepartmentFormData,
+  MOCK_DEPARTMENTS,
 } from "@/services/departments";
 import { useEmployeesForSelect } from "@/services/employees";
 import { useToast } from "@/hooks/use-toast";
@@ -35,13 +36,14 @@ const DepartmentPage: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
   const pageSize = 12;
 
-  const { data: apiData, isLoading } = useDepartments();
+  const { data: apiData, isLoading, isError } = useDepartments();
   const { data: employees = [] } = useEmployeesForSelect();
   const createMut = useCreateDepartment();
   const updateMut = useUpdateDepartment();
   const deleteMut = useDeleteDepartment();
 
-  const items = Array.isArray(apiData) ? apiData : (apiData?.items ?? []);
+  const useMock = isError || !apiData;
+  const items = useMock ? MOCK_DEPARTMENTS : (Array.isArray(apiData) ? apiData : (apiData?.items ?? []));
   const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
 
   const filteredItems = items.filter((d) =>

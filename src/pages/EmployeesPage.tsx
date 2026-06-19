@@ -308,7 +308,7 @@ const EmployeesPage = () => {
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">{emp.email}</td>
                       <td className="px-4 py-3"><StatusBadge variant="info">{emp.role_name ?? emp.role_id}</StatusBadge></td>
-                      <td className="px-4 py-3"><StatusBadge variant="neutral">{emp.department}</StatusBadge></td>
+                      <td className="px-4 py-3"><StatusBadge variant="neutral">{emp.department || "—"}</StatusBadge></td>
                       <td className="px-4 py-3 text-muted-foreground tabular-nums">{format(new Date(emp.hire_date), "MMM d, yyyy")}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">

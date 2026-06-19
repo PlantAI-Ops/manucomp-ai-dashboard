@@ -278,10 +278,10 @@ export default function AssessmentsPage() {
                       <TableCell>
                         <LevelIndicator level={a.assessed_level} size="sm" />
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{a.assessor_name}</TableCell>
+                      <TableCell className="text-muted-foreground">{a.assessor_name || "—"}</TableCell>
                       <TableCell>
                         <StatusBadge variant={ASSESSOR_TYPE_VARIANTS[a.assessor_type] || "neutral"}>
-                          {a.assessor_type.charAt(0).toUpperCase() + a.assessor_type.slice(1)}
+                          {a.assessor_type ? a.assessor_type.charAt(0).toUpperCase() + a.assessor_type.slice(1) : "—"}
                         </StatusBadge>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
