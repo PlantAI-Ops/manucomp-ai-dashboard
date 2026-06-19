@@ -208,10 +208,19 @@ export async function fetchEmployeeDetail(id: string): Promise<EmployeeDetail> {
 }
 
 export async function fetchAssessments(employeeId: string): Promise<AssessmentRecord[]> {
-  const { data } = await api.get<{ items: AssessmentRecord[] }>("/assessments", {
-    params: { employee_id: employeeId, page_size: 100 },
-  });
-  return data.items;
+  const { data } = await api.get<EmployeeCompetencyHistoryResponse>(
+    `/assessments/employee/${employeeId}/history`
+  );
+  // Transform the history endpoint response to AssessmentRecord[]
+  return (data.assessments ?? []).map((a: Record<string, unknown>) => ({
+    id: String(a.id ?? a.assessment_id ?? ""),
+    competency_name: String(a.competency_name ?? a.competency ?? ""),
+    level: Number(a.level ?? a.assessed_level ?? 0),
+    assessor_name: String(a.assessor_name ?? a.assessor ?? ""),
+    assessment_type: String(a.assessment_type ?? a.type ?? "Assessment"),
+    assessed_at: String(a.assessed_at ?? a.date ?? ""),
+    notes: a.notes ?? null,
+  }));
 }
 
 export async function generateAiInsight(employeeId: string): Promise<AiInsightResponse> {
