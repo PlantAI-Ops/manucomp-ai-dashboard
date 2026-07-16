@@ -124,7 +124,7 @@ export function buildMockEmployeeDetail(id: string): EmployeeDetail {
     hire_date: new Date(2020 + Math.floor(idx / 12), idx % 12, 1 + (idx % 28)).toISOString().split("T")[0],
     is_active: idx % 9 !== 0,
     created_at: new Date().toISOString(),
-    competency_summary: { total: competencies.length, assessed, gaps, readiness_percentage: readiness },
+    competency_summary: { total_required: competencies.length, assessed, gaps, readiness_percentage: readiness },
     competencies,
   };
 }
