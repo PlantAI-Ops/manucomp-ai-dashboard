@@ -27,8 +27,7 @@ import { toast } from "sonner";
 import api from "@/services/api";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  useEmployeeDetail,
-  useEmployeeCompetencyHistory,
+  useEmployeeDetailWithHistory,
   buildMockEmployeeDetail,
   type EmployeeDetail,
 } from "@/services/employeeDetail";
