@@ -4,7 +4,9 @@ import { Progress } from "@/components/ui/progress";
 import { AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import type { CompetencySummaryItem } from "@/services/employeeDetail";
+import type { CompetencySummaryItem, EmployeeCompetencyHistoryItem } from "@/services/employeeDetail";
+
+type CompetencyItem = CompetencySummaryItem | EmployeeCompetencyHistoryItem;
 
 interface CompetencySummary {
   total_required: number;
@@ -13,9 +15,17 @@ interface CompetencySummary {
 }
 
 interface CompetencyTabProps {
-  competencies: CompetencySummaryItem[];
+  competencies: CompetencyItem[];
   summary?: CompetencySummary;
   isLoading?: boolean;
+}
+
+function getAssessedLevel(comp: CompetencyItem): number | null {
+  return "assessed_level" in comp ? comp.assessed_level : comp.latest_assessed_level;
+}
+
+function getSafetyCritical(comp: CompetencyItem): boolean {
+  return "safety_critical" in comp ? comp.safety_critical : comp.is_safety_critical;
 }
 
 export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [], summary, isLoading }) => {
@@ -31,7 +41,7 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [],
 
   const displaySummary = summary || {
     total_required: competencies.length,
-    assessed: competencies.filter((c) => c.assessed_level !== null).length,
+    assessed: competencies.filter((c) => getAssessedLevel(c) !== null).length,
     gaps: competencies.filter((c) => c.gap > 0).length,
   };
 
@@ -98,8 +108,8 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [],
                     <LevelIndicator level={comp.required_level ?? 0} size="sm" />
                   </td>
                   <td className="px-4 py-3">
-                    {comp.assessed_level !== null ? (
-                      <LevelIndicator level={comp.assessed_level} size="sm" />
+                    {getAssessedLevel(comp) !== null ? (
+                      <LevelIndicator level={getAssessedLevel(comp)!} size="sm" />
                     ) : (
                       <span className="text-xs text-muted-foreground italic">Not Assessed</span>
                     )}
@@ -119,7 +129,7 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [],
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {comp.safety_critical && (
+                    {getSafetyCritical(comp) && (
                       <AlertTriangle className="h-4 w-4 text-warning" />
                     )}
                   </td>

@@ -28,6 +28,7 @@ import api from "@/services/api";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useEmployeeDetail,
+  useEmployeeCompetencyHistory,
   buildMockEmployeeDetail,
   type EmployeeDetail,
 } from "@/services/employeeDetail";
@@ -38,7 +39,7 @@ const EmployeeDetailPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: apiEmployee, isLoading, isError, isMock } = useEmployeeDetail(id!);
+  const { data: apiEmployee, isLoading, isError, isMock } = useEmployeeDetailWithHistory(id!);
   const mockEmployee = isError ? buildMockEmployeeDetail(id!) : null;
   const employee: EmployeeDetail | null = apiEmployee || mockEmployee;
 

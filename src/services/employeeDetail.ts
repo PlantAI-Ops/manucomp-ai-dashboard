@@ -273,6 +273,20 @@ export function useEmployeeCompetencyHistory(employeeId: string) {
   };
 }
 
+export function useAssessments(employeeId: string) {
+  const query = useQuery({
+    queryKey: ["assessments", employeeId],
+    queryFn: () => fetchAssessments(employeeId),
+    enabled: !isMockId(employeeId),
+    retry: false,
+  });
+
+  return {
+    ...query,
+    isMock: isMockId(employeeId),
+  };
+}
+
 export function useEmployeeDetail(id: string) {
   const query = useQuery({
     queryKey: ["employee-detail", id],
@@ -287,16 +301,42 @@ export function useEmployeeDetail(id: string) {
   };
 }
 
-export function useAssessments(employeeId: string) {
-  const query = useQuery({
-    queryKey: ["assessments", employeeId],
-    queryFn: () => fetchAssessments(employeeId),
-    enabled: !isMockId(employeeId),
+export function useEmployeeDetailWithHistory(id: string) {
+  const detailQuery = useQuery({
+    queryKey: ["employee-detail", id],
+    queryFn: () => fetchEmployeeDetail(id),
+    enabled: !isMockId(id),
     retry: false,
   });
 
+  const historyQuery = useQuery({
+    queryKey: ["employee-competency-history", id],
+    queryFn: () => fetchEmployeeCompetencyHistory(id),
+    enabled: !isMockId(id),
+    retry: false,
+    throwOnError: false,
+  });
+
+  const mergedData = detailQuery.data && historyQuery.data
+    ? {
+        ...detailQuery.data,
+        competencies: historyQuery.data.competencies.map((c) => ({
+          competency_id: c.competency_id,
+          competency_name: c.competency_name,
+          category: c.category,
+          required_level: c.required_level ?? 0,
+          assessed_level: c.latest_assessed_level,
+          gap: c.gap,
+          safety_critical: c.is_safety_critical,
+        })),
+      }
+    : detailQuery.data;
+
   return {
-    ...query,
-    isMock: isMockId(employeeId),
+    ...detailQuery,
+    data: mergedData,
+    isMock: isMockId(id),
+    isLoading: detailQuery.isLoading || historyQuery.isLoading,
+    isError: detailQuery.isError || historyQuery.isError,
   };
 }
