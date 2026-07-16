@@ -20,11 +20,14 @@ interface CompetencyTabProps {
 
 export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [], summary, isLoading }) => {
 
-  const readinessPercentage = summary?.total_required 
+  const readinessPercentage = summary?.total_required
     ? Math.round(((summary.total_required - summary.gaps) / summary.total_required) * 100)
     : competencies.length > 0
       ? Math.round(((competencies.length - competencies.filter((c) => c.gap > 0).length) / competencies.length) * 100)
       : 0;
+
+  const readinessColor = readinessPercentage >= 80 ? "text-success" : readinessPercentage >= 60 ? "text-warning" : "text-destructive";
+  const progressColor = readinessPercentage >= 80 ? "bg-success" : readinessPercentage >= 60 ? "bg-warning" : "bg-destructive";
 
   const displaySummary = summary || {
     total_required: competencies.length,
