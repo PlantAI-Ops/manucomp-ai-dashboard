@@ -22,6 +22,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   subtitle,
   breadcrumbs,
   actions,
+  productBadge,
   className,
 }) => {
   return (
