@@ -66,7 +66,7 @@ async function fetchAuditLogs(
   if (filters.end_date) params.end_date = filters.end_date;
   if (filters.search) params.search = filters.search;
 
-  const { data } = await api.get<AuditLogPaginatedResponse>("/audit/logs", { params });
+  const { data } = await api.get<AuditLogPaginatedResponse>("/audit", { params });
   return data;
 }
 
