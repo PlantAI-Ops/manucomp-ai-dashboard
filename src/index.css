@@ -4,87 +4,169 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   PlantAI Design System
+   Industrial · Enterprise · Operational
+   ============================================ */
+
 @layer base {
+  /* ---------- LIGHT THEME (default, warm white) ---------- */
   :root {
-    --background: 222 47% 8%;
-    --foreground: 213 31% 91%;
+    --background: 40 20% 96%;
+    --foreground: 216 12% 16%;
 
-    --card: 222 41% 11%;
-    --card-foreground: 213 31% 91%;
+    --card: 0 0% 100%;
+    --card-foreground: 216 12% 16%;
 
-    --popover: 222 41% 11%;
-    --popover-foreground: 213 31% 91%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 12% 16%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 8%;
+    --primary: 216 12% 16%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 168 76% 40%;
+    --secondary: 210 12% 34%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 222 30% 16%;
-    --muted-foreground: 215 20% 55%;
+    --accent: 100 42% 38%;
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 100 34% 48%;
 
-    --accent: 222 30% 16%;
-    --accent-foreground: 213 31% 91%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 0%;
-
-    --success: 168 76% 40%;
+    --success: 100 42% 38%;
     --success-foreground: 0 0% 100%;
 
-    --info: 217 91% 60%;
+    --muted: 210 15% 94%;
+    --muted-foreground: 210 10% 42%;
+
+    --destructive: 3 55% 49%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 43 86% 45%;
+    --warning-foreground: 216 12% 16%;
+
+    --info: 202 46% 44%;
     --info-foreground: 0 0% 100%;
 
-    --border: 222 20% 20%;
-    --input: 222 20% 20%;
-    --ring: 217 91% 60%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 100 42% 38%;
 
-    --radius: 0.5rem;
-    --radius-card: 8px;
+    --radius: 0.75rem;
+    --radius-card: 12px;
     --radius-input: 6px;
     --radius-pill: 20px;
 
-    --sidebar-background: 222 47% 6%;
-    --sidebar-foreground: 213 31% 80%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-background: 40 20% 97%;
+    --sidebar-foreground: 210 10% 40%;
+    --sidebar-primary: 216 12% 16%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 30% 14%;
-    --sidebar-accent-foreground: 213 31% 91%;
-    --sidebar-border: 222 20% 16%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-accent: 210 15% 92%;
+    --sidebar-accent-foreground: 216 12% 16%;
+    --sidebar-border: 220 13% 88%;
+    --sidebar-ring: 100 42% 38%;
 
-    --glass-bg: 222 41% 11% / 0.6;
-    --glass-border: 213 31% 91% / 0.08;
-
-    --primary-end: 217 91% 50%;
-    --purple: 270 70% 60%;
+    --shadow-sm: 0 1px 2px hsl(216 12% 16% / 0.04);
+    --shadow-md: 0 4px 12px hsl(216 12% 16% / 0.06);
+    --shadow-lg: 0 8px 24px hsl(216 12% 16% / 0.08);
   }
-}
 
-@layer base {
+  /* ---------- DARK THEME ---------- */
+  .dark {
+    --background: 216 14% 10%;
+    --foreground: 40 20% 96%;
+
+    --card: 216 12% 16%;
+    --card-foreground: 40 20% 96%;
+
+    --popover: 216 12% 16%;
+    --popover-foreground: 40 20% 96%;
+
+    --primary: 40 20% 96%;
+    --primary-foreground: 216 12% 16%;
+
+    --secondary: 214 15% 22%;
+    --secondary-foreground: 40 20% 96%;
+
+    --accent: 100 42% 42%;
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 100 34% 52%;
+
+    --success: 100 34% 50%;
+    --success-foreground: 0 0% 100%;
+
+    --muted: 214 15% 20%;
+    --muted-foreground: 210 12% 72%;
+
+    --destructive: 3 55% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 43 86% 58%;
+    --warning-foreground: 216 12% 16%;
+
+    --info: 202 46% 58%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 214 12% 24%;
+    --input: 214 12% 24%;
+    --ring: 100 34% 52%;
+
+    --sidebar-background: 216 14% 8%;
+    --sidebar-foreground: 210 12% 72%;
+    --sidebar-primary: 100 42% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 214 15% 18%;
+    --sidebar-accent-foreground: 40 20% 96%;
+    --sidebar-border: 214 12% 20%;
+    --sidebar-ring: 100 42% 42%;
+
+    --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.35);
+    --shadow-lg: 0 8px 24px hsl(0 0% 0% / 0.4);
+  }
+
   * {
     @apply border-border;
   }
 
+  html {
+    color-scheme: light dark;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    transition: background-color 240ms ease, color 240ms ease;
+  }
+
+  .theme-transition,
+  .theme-transition * {
+    transition: background-color 240ms ease, border-color 240ms ease, color 240ms ease !important;
   }
 }
 
 @layer utilities {
+  /* Legacy .glass — now maps to enterprise panel */
   .glass {
-    background: hsla(var(--glass-bg));
-    backdrop-filter: blur(12px);
-    border: 1px solid hsla(var(--glass-border));
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: none;
   }
 
   .glass-hover:hover {
-    border-color: hsla(213, 31%, 91%, 0.15);
-    background: hsla(222, 41%, 11%, 0.75);
+    box-shadow: var(--shadow-md);
+    border-color: hsl(var(--accent) / 0.5);
+  }
+
+  /* Accent line indicator for cards */
+  .accent-line {
+    position: relative;
+  }
+  .accent-line::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: hsl(var(--accent));
+    border-radius: 3px 0 0 3px;
   }
 
   .animate-in-up {
@@ -97,17 +179,14 @@
   .stagger-4 { animation-delay: 240ms; }
   .stagger-5 { animation-delay: 300ms; }
 
-  /* Page transition wrapper */
   .page-transition {
     animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  /* Count-up number animation */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Mobile touch targets */
   @media (max-width: 639px) {
     .touch-target {
       min-height: 44px;
@@ -115,12 +194,10 @@
     }
   }
 
-  /* Hide on mobile, show on desktop */
   .mobile-hidden {
     @apply hidden sm:block;
   }
 
-  /* Bottom nav for mobile */
   .mobile-bottom-nav {
     @apply fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t bg-background/95 backdrop-blur-md px-2 py-1 sm:hidden;
     padding-bottom: env(safe-area-inset-bottom, 8px);
@@ -130,13 +207,11 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
-    filter: blur(4px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
   }
 }
 
