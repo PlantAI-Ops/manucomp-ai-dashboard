@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ThemeProvider } from "@/hooks/useTheme";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NetworkErrorToast } from "@/components/NetworkErrorToast";
 import DashboardPage from "./pages/DashboardPage";
@@ -37,7 +38,8 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
       <Toaster />
       <Sonner position="top-right" closeButton richColors duration={4000} />
       <ErrorBoundary>
@@ -66,7 +68,8 @@ const App = () => (
           </AuthProvider>
         </BrowserRouter>
       </ErrorBoundary>
-    </TooltipProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

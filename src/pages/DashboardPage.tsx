@@ -70,7 +70,7 @@ const DashboardPage = () => {
             icon={<Award className="h-5 w-5" />}
             label="Total Competencies"
             value={isLoading ? "—" : summary.total_competencies}
-            iconClassName="bg-purple/10 text-purple"
+            iconClassName="bg-accent/10 text-accent"
           />
         </div>
         <div className="animate-in-up stagger-4">
@@ -112,29 +112,29 @@ const DashboardPage = () => {
                   data={summary.role_readiness}
                   margin={{ top: 0, right: 16, bottom: 0, left: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222 20% 20%)" horizontal={false} />
-                  <XAxis type="number" tick={{ fill: "hsl(215 20% 55%)", fontSize: 12 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+                  <XAxis type="number" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
                   <YAxis
                     dataKey="role_name"
                     type="category"
                     width={110}
-                    tick={{ fill: "hsl(213 31% 91%)", fontSize: 12 }}
+                    tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "hsl(222 41% 11%)",
-                      border: "1px solid hsl(222 20% 20%)",
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
                       borderRadius: 8,
-                      color: "hsl(213 31% 91%)",
+                      color: "hsl(var(--foreground))",
                       fontSize: 12,
                     }}
                   />
                   <Legend
-                    wrapperStyle={{ fontSize: 12, color: "hsl(215 20% 55%)" }}
+                    wrapperStyle={{ fontSize: 12, color: "hsl(var(--muted-foreground))" }}
                   />
-                  <Bar dataKey="fully_qualified" name="Fully Qualified" stackId="a" fill="hsl(168 76% 40%)" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="partially_qualified" name="Partially Qualified" stackId="a" fill="hsl(38 92% 50%)" />
-                  <Bar dataKey="unqualified" name="Unqualified" stackId="a" fill="hsl(0 84% 60%)" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="fully_qualified" name="Fully Qualified" stackId="a" fill="hsl(var(--accent))" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="partially_qualified" name="Partially Qualified" stackId="a" fill="hsl(var(--warning))" />
+                  <Bar dataKey="unqualified" name="Unqualified" stackId="a" fill="hsl(var(--destructive))" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -159,21 +159,21 @@ const DashboardPage = () => {
                   data={summary.top_skill_gaps}
                   margin={{ top: 0, right: 16, bottom: 0, left: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222 20% 20%)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis
                     dataKey="competency_name"
-                    tick={{ fill: "hsl(215 20% 55%)", fontSize: 11 }}
+                    tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
                     angle={-35}
                     textAnchor="end"
                     height={70}
                   />
-                  <YAxis tick={{ fill: "hsl(215 20% 55%)", fontSize: 12 }} />
+                  <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "hsl(222 41% 11%)",
-                      border: "1px solid hsl(222 20% 20%)",
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
                       borderRadius: 8,
-                      color: "hsl(213 31% 91%)",
+                      color: "hsl(var(--foreground))",
                       fontSize: 12,
                     }}
                   />
@@ -183,10 +183,10 @@ const DashboardPage = () => {
                         key={idx}
                         fill={
                           entry.gap_count >= 15
-                            ? "hsl(0 84% 60%)"
+                            ? "hsl(var(--destructive))"
                             : entry.gap_count >= 10
-                            ? "hsl(38 92% 50%)"
-                            : "hsl(217 91% 60%)"
+                            ? "hsl(var(--warning))"
+                            : "hsl(var(--accent))"
                         }
                       />
                     ))}

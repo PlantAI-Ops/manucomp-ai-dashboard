@@ -92,14 +92,14 @@ const LoginPage = () => {
         <Button
           type="submit"
           disabled={!canSubmit}
-          className="w-full bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity rounded-input active:scale-[0.98]"
+          className="w-full bg-accent hover:bg-accent-hover text-accent-foreground rounded-input active:scale-[0.98] transition-colors font-medium"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <Link to="/register" className="text-primary hover:underline font-medium">
+          <Link to="/register" className="text-accent hover:text-accent-hover hover:underline font-medium">
             Register
           </Link>
         </p>

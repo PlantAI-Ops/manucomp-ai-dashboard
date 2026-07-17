@@ -1,16 +1,28 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ManuComp AI — Manufacturing Competency Management</title>
-    <meta name="description" content="AI-powered manufacturing employee competency management system for tracking skills, assessments, and workforce development." />
-    <meta name="author" content="ManuComp AI" />
-    <meta property="og:title" content="ManuComp AI" />
-    <meta property="og:description" content="AI-powered manufacturing employee competency management" />
+    <title>PlantAI — Ops & Automation</title>
+    <meta name="description" content="PlantAI Ops & Automation — industrial-grade competency management, workforce readiness, and operational intelligence for enterprise manufacturing." />
+    <meta name="author" content="PlantAI" />
+    <meta property="og:title" content="PlantAI — Ops & Automation" />
+    <meta property="og:description" content="Industrial competency intelligence and operational readiness for enterprise manufacturing." />
     <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#23272D" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('plantai_theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = stored === 'dark' || ((!stored || stored === 'system') && prefersDark);
+          if (isDark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
