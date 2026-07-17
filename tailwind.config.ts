@@ -51,6 +51,7 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          hover: "hsl(var(--accent-hover))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -72,8 +73,9 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
-        "primary-end": "hsl(var(--primary-end))",
-        purple: "hsl(var(--purple))",
+        // Legacy aliases retained so any old references still compile.
+        "primary-end": "hsl(var(--primary))",
+        purple: "hsl(var(--accent))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
