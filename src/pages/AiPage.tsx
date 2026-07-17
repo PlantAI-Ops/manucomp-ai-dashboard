@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,48 +9,88 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, AlertTriangle, Lightbulb, TrendingUp, Users, Briefcase, Zap, Info, BarChart3 } from "lucide-react";
+import { Sparkles, AlertTriangle, Lightbulb, TrendingUp, Users, Briefcase, Zap, Info, BarChart3, Loader2, RefreshCw, Target, Shield, BookOpen, TrendingDown, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useAiOrgInsights, type AiOrgInsightsResponse, type TrainingRecommendation, type ReadinessSummary, type WorkforceReadinessReport, type CriticalGapDetail } from "@/services/analytics";
 
-const MOCK_INSIGHTS = {
-  summary: "The organization shows strong readiness in Quality Inspection and Lean Manufacturing competencies. However, critical gaps exist in CNC Programming and Welding skills across multiple departments. Immediate training interventions recommended for Assembly and Welding teams.",
-  recommendations: [
-    "Implement CNC Programming bootcamp for Assembly team within Q2",
-    "Establish mentorship program pairing senior welders with newer employees",
-    "Deploy ISO 9001 refresher training across Quality department",
-    "Consider cross-training program for Maintenance technicians in SPC Analysis",
-  ],
-  priority_actions: [
-    { action: "12 employees lack Lockout/Tagout certification — compliance risk", severity: "critical" as const },
-    { action: "5 CNC operators below required proficiency in 5-Axis Machining", severity: "critical" as const },
-    { action: "Forklift Operation certifications expiring for 8 employees", severity: "high" as const },
-    { action: "Welding TIG skills gap affecting production quality metrics", severity: "high" as const },
-  ],
-  workforce_metrics: {
-    overall_readiness: 72,
-    critical_gaps: 17,
-    training_needed: 45,
-    certified_employees: 89,
-  },
-  department_insights: [
-    { department: "Assembly", readiness: 68, topGap: "5-Axis Machining", employees_affected: 8 },
-    { department: "Quality", readiness: 85, topGap: "SPC Analysis", employees_affected: 3 },
-    { department: "Welding", readiness: 61, topGap: "Welding - TIG", employees_affected: 6 },
-    { department: "CNC", readiness: 74, topGap: "CNC Programming", employees_affected: 5 },
-    { department: "Maintenance", readiness: 79, topGap: "Blueprint Reading", employees_affected: 4 },
-    { department: "Safety", readiness: 91, topGap: "Lean Manufacturing", employees_affected: 2 },
-  ],
-};
+function getGapValue(gap: CriticalGapDetail): number {
+  return gap.gap ?? gap.gap_level ?? gap.gap_size ?? gap.level_gap ?? 0;
+}
+import { useAuth } from "@/hooks/useAuth";
+import ReactMarkdown from "react-markdown";
 
-const MOCK_TRAINING_SUGGESTIONS = [
-  { id: 1, name: "CNC Programming Fundamentals", target: "Assembly Team", participants: 8, priority: "critical", duration: "2 weeks" },
-  { id: 2, name: "Advanced TIG Welding", target: "Welding Team", participants: 6, priority: "high", duration: "1 week" },
-  { id: 3, name: "Lockout/Tagout Certification", target: "All Departments", participants: 12, priority: "critical", duration: "3 days" },
-  { id: 4, name: "SPC Analysis Mastery", target: "Quality Team", participants: 5, priority: "medium", duration: "1 week" },
-  { id: 5, name: "Blueprint Reading Advanced", target: "Maintenance Team", participants: 4, priority: "medium", duration: "5 days" },
-  { id: 6, name: "Lean Manufacturing Principles", target: "Safety Team", participants: 3, priority: "low", duration: "3 days" },
-];
+function parseTopGapAnalysis(text: string) {
+  const recommendations: string[] = [];
+  const priorityActions: { action: string; severity: "critical" | "high" | "medium" }[] = [];
+
+  const recMatch = text.match(/\*\*Recommendations:\*\*\n\n((?:- .+\n?)+)/);
+  if (recMatch) {
+    recommendations.push(...recMatch[1].split("\n").filter(l => l.startsWith("- ")).map(l => l.slice(2).trim()));
+  }
+
+  const riskMatch = text.match(/Gaps posing the biggest risk to operations or safety:([\s\S]*?)(?:\n\d\.|$)/);
+  if (riskMatch) {
+    const items = riskMatch[1].match(/- .+/g);
+    if (items) {
+      items.forEach(item => {
+        priorityActions.push({ action: item.slice(2).trim(), severity: "critical" });
+      });
+    }
+  }
+
+  const impactMatch = text.match(/Gaps affecting the most employees and having the broadest impact:([\s\S]*?)(?:\n\d\.|$)/);
+  if (impactMatch) {
+    const items = impactMatch[1].match(/- .+/g);
+    if (items) {
+      items.forEach(item => {
+        priorityActions.push({ action: item.slice(2).trim(), severity: "high" });
+      });
+    }
+  }
+
+  const interventionMatch = text.match(/Highest-impact intervention:([\s\S]*?)(?:\n\*\*Recommendations:|$)/);
+  if (interventionMatch) {
+    const text2 = interventionMatch[1];
+    const boldMatch = text2.match(/\*\*(.+?)\*\*/);
+    if (boldMatch) {
+      priorityActions.unshift({ action: boldMatch[1].trim(), severity: "critical" });
+    }
+  }
+
+  return { recommendations, priorityActions };
+}
+
+function transformTrainingRecommendations(recs: TrainingRecommendation[]) {
+  return recs.map((r, i) => {
+    const impactStr = String(r.estimated_impact || "");
+    const participantMatch = impactStr.match(/(\d+)\s*(?:employees?|people|participants?)/i);
+    const participants = participantMatch ? parseInt(participantMatch[1], 10) : 0;
+    return {
+      id: i + 1,
+      name: r.title,
+      target: r.target_gaps.join(", "),
+      participants,
+      priority: r.priority,
+      duration: r.category === "safety" ? "3 days" : r.category === "technical" ? "1 week" : "5 days",
+      description: r.description,
+      category: r.category,
+      estimatedImpact: r.estimated_impact,
+    };
+  });
+}
+
+function transformDepartmentInsights(readinessSummaries: ReadinessSummary[]) {
+  return readinessSummaries.map(r => ({
+    department: r.role_name,
+    readiness: Math.round(r.readiness_percentage),
+    topGap: r.status_summary.match(/gap in (?:this|these) (?:area|areas)[^.]*\.?/i)?.[0]?.replace(/gap in (?:this|these) (?:area|areas) /i, "")?.replace(".", "") || "Multiple gaps",
+    employees_affected: r.total_employees,
+    fully_qualified: r.fully_qualified || 0,
+    partially_qualified: r.partially_qualified || 0,
+    unqualified: r.unqualified || 0,
+  }));
+}
 
 function FallbackBanner() {
   return (
@@ -62,37 +103,20 @@ function FallbackBanner() {
   );
 }
 
-function InsightsTab() {
-  const [loading, setLoading] = useState(false);
-  const [insights, setInsights] = useState<typeof MOCK_INSIGHTS | null>(null);
-
-  const handleGenerate = async () => {
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setInsights(MOCK_INSIGHTS);
-    setLoading(false);
-    toast.success("AI insights generated successfully");
+function InsightsTab({ data, isLoading, error }: { data: AiOrgInsightsResponse | undefined; isLoading: boolean; error: Error | null }) {
+  const severityStyles = {
+    critical: "border-destructive/40 bg-destructive/10",
+    high: "border-warning/40 bg-warning/10",
+    medium: "border-primary/40 bg-primary/10",
   };
 
-  if (!insights && !loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-          <Sparkles className="h-7 w-7" />
-        </div>
-        <h3 className="text-lg font-medium mb-2">Organization AI Assistant</h3>
-        <p className="text-sm text-muted-foreground max-w-md mb-6">
-          Generate comprehensive AI-powered insights about your workforce competency landscape.
-          Get actionable recommendations for training, compliance, and skill development.
-        </p>
-        <Button onClick={handleGenerate} className="gap-2">
-          <Sparkles className="h-4 w-4" /> Generate Workforce Insights
-        </Button>
-      </div>
-    );
-  }
+  const severityIcons = {
+    critical: <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />,
+    high: <AlertTriangle className="h-4 w-4 text-warning shrink-0" />,
+    medium: <Zap className="h-4 w-4 text-primary shrink-0" />,
+  };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-48 w-full bg-muted rounded-card" />
@@ -107,19 +131,35 @@ function InsightsTab() {
     );
   }
 
-  if (!insights) return null;
+  if (error) {
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>Failed to load AI insights: {error.message}</AlertDescription>
+      </Alert>
+    );
+  }
 
-  const severityStyles = {
-    critical: "border-destructive/40 bg-destructive/10",
-    high: "border-warning/40 bg-warning/10",
-    medium: "border-primary/40 bg-primary/10",
-  };
+  if (!data) return null;
 
-  const severityIcons = {
-    critical: <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />,
-    high: <AlertTriangle className="h-4 w-4 text-warning shrink-0" />,
-    medium: <Zap className="h-4 w-4 text-primary shrink-0" />,
-  };
+  const { recommendations, priorityActions } = parseTopGapAnalysis(data.top_gap_analysis);
+  const report = data.workforce_readiness_report;
+  const trends = data.competency_trends;
+
+  const overallReadiness = Math.round(report.readiness_score);
+  const criticalGaps = report.critical_gaps;
+  
+  // Calculate total employees and fully qualified from readiness summaries
+  const totalEmployees = data.readiness_summaries.reduce((sum, r) => sum + r.total_employees, 0);
+  const fullyQualified = data.readiness_summaries.reduce((sum, r) => sum + (r.fully_qualified || 0), 0);
+  const partiallyQualified = data.readiness_summaries.reduce((sum, r) => sum + (r.partially_qualified || 0), 0);
+  const unqualified = data.readiness_summaries.reduce((sum, r) => sum + (r.unqualified || 0), 0);
+  
+  // Need Training = employees with gaps (partially qualified + unqualified)
+  const trainingNeeded = partiallyQualified + unqualified;
+  
+  // Certified = percentage of fully qualified employees
+  const certifiedPercentage = totalEmployees > 0 ? Math.round((fullyQualified / totalEmployees) * 100) : 0;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -129,28 +169,28 @@ function InsightsTab() {
         <Card className="glass border-border/50">
           <CardContent className="pt-6 text-center">
             <TrendingUp className="h-5 w-5 mx-auto mb-2 text-primary" />
-            <p className="text-2xl font-bold">{insights.workforce_metrics.overall_readiness}%</p>
+            <p className="text-2xl font-bold">{overallReadiness}%</p>
             <p className="text-xs text-muted-foreground">Overall Readiness</p>
           </CardContent>
         </Card>
         <Card className="glass border-border/50">
           <CardContent className="pt-6 text-center">
             <AlertTriangle className="h-5 w-5 mx-auto mb-2 text-destructive" />
-            <p className="text-2xl font-bold">{insights.workforce_metrics.critical_gaps}</p>
+            <p className="text-2xl font-bold">{criticalGaps}</p>
             <p className="text-xs text-muted-foreground">Critical Gaps</p>
           </CardContent>
         </Card>
         <Card className="glass border-border/50">
           <CardContent className="pt-6 text-center">
             <Users className="h-5 w-5 mx-auto mb-2 text-warning" />
-            <p className="text-2xl font-bold">{insights.workforce_metrics.training_needed}</p>
+            <p className="text-2xl font-bold">{trainingNeeded}</p>
             <p className="text-xs text-muted-foreground">Need Training</p>
           </CardContent>
         </Card>
         <Card className="glass border-border/50">
           <CardContent className="pt-6 text-center">
             <Briefcase className="h-5 w-5 mx-auto mb-2 text-success" />
-            <p className="text-2xl font-bold">{insights.workforce_metrics.certified_employees}%</p>
+            <p className="text-2xl font-bold">{certifiedPercentage}%</p>
             <p className="text-xs text-muted-foreground">Certified</p>
           </CardContent>
         </Card>
@@ -164,7 +204,9 @@ function InsightsTab() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground leading-relaxed">{insights.summary}</p>
+          <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none">
+            <ReactMarkdown>{report.executive_summary}</ReactMarkdown>
+          </div>
         </CardContent>
       </Card>
 
@@ -173,12 +215,12 @@ function InsightsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-warning" />
-              Recommendations
+              Key Recommendations
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
-              {insights.recommendations.map((rec, i) => (
+              {recommendations.map((rec, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm">
                   <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                   <span className="text-muted-foreground">{rec}</span>
@@ -196,7 +238,7 @@ function InsightsTab() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {insights.priority_actions.map((action, i) => (
+            {priorityActions.map((action, i) => (
               <div
                 key={i}
                 className={cn("rounded-lg border p-3 flex items-start gap-3", severityStyles[action.severity])}
@@ -212,21 +254,124 @@ function InsightsTab() {
         </Card>
       </div>
 
-      <div className="flex justify-end">
-        <Button variant="outline" size="sm" onClick={handleGenerate} className="gap-2">
-          <Sparkles className="h-3.5 w-3.5" /> Regenerate Insights
-        </Button>
-      </div>
+      {data.critical_gap_details && data.critical_gap_details.length > 0 && (
+        <Card className="glass border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-destructive" />
+              Critical Gaps
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {data.critical_gap_details.map((gap, i) => (
+              <div key={i} className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg border border-destructive/20 bg-destructive/5">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="font-medium text-sm truncate">{gap.employee_name}</span>
+                  {gap.role_name && <span className="text-muted-foreground text-xs">({gap.role_name})</span>}
+                  <span className="text-muted-foreground text-xs truncate">{gap.competency_name}</span>
+                </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="destructive" className="text-xs">Gap: {getGapValue(gap)}</Badge>
+                    <Badge variant="destructive" className="text-xs">Critical</Badge>
+                  </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {data.high_gap_details && data.high_gap_details.length > 0 && (
+        <Card className="glass border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-warning" />
+              High Gaps
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {data.high_gap_details.map((gap, i) => (
+              <div key={i} className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg border border-warning/20 bg-warning/5">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="font-medium text-sm truncate">{gap.employee_name}</span>
+                  {gap.role_name && <span className="text-muted-foreground text-xs">({gap.role_name})</span>}
+                  <span className="text-muted-foreground text-xs truncate">{gap.competency_name}</span>
+                </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">Gap: {getGapValue(gap)}</Badge>
+                    <Badge variant="secondary" className="text-xs">High</Badge>
+                  </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className="glass border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4 text-primary" />
+            Competency Trends
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {Object.entries(trends.category_distribution).map(([category, stats]) => (
+              <div key={category} className="p-3 rounded-lg bg-muted/50">
+                <p className="text-xs font-medium capitalize text-muted-foreground">{category.replace("_", " ")}</p>
+                <p className="text-lg font-bold">{stats.assessed}/{stats.total}</p>
+                <p className="text-xs text-muted-foreground">Avg Level: {stats.avg_level.toFixed(1)}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 pt-4 border-t border-border/50">
+            <p className="text-xs text-muted-foreground">
+              Total Competencies: <strong>{trends.total_competencies}</strong> | 
+              Total Assessments: <strong>{trends.total_assessments}</strong> | 
+              Safety-Critical: <strong>{trends.safety_critical_stats.assessed}/{trends.safety_critical_stats.total}</strong> assessed
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+          <Card className="glass border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-primary" />
+            Workforce Summary
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none">
+            <ReactMarkdown>{data.workforce_summary}</ReactMarkdown>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="glass border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-4 w-4 text-primary" />
+            Gap Analysis Detail
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm max-w-none">
+            <ReactMarkdown>{data.top_gap_analysis}</ReactMarkdown>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
-function TrainingTab() {
+function TrainingTab({ data, isLoading }: { data: AiOrgInsightsResponse | undefined; isLoading: boolean }) {
   const [selectedDept, setSelectedDept] = useState<string>("all");
 
+  const trainingData = transformTrainingRecommendations(data?.training_recommendations || []);
+
   const filteredSuggestions = selectedDept === "all"
-    ? MOCK_TRAINING_SUGGESTIONS
-    : MOCK_TRAINING_SUGGESTIONS.filter((t) => t.target.includes(selectedDept));
+    ? trainingData
+    : trainingData.filter((t) => t.target.toLowerCase().includes(selectedDept.toLowerCase()));
 
   const priorityColors = {
     critical: "bg-destructive text-destructive-foreground",
@@ -235,22 +380,36 @@ function TrainingTab() {
     low: "bg-muted text-muted-foreground",
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <FallbackBanner />
+          <Skeleton className="w-48 h-10" />
+        </div>
+        <div className="grid gap-4">
+          {[1, 2, 3, 4, 5].map(i => (
+            <Skeleton key={i} className="h-28 bg-muted rounded-card" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <FallbackBanner />
         <Select value={selectedDept} onValueChange={setSelectedDept}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by department" />
+            <SelectValue placeholder="Filter by category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Departments</SelectItem>
-            <SelectItem value="Assembly">Assembly</SelectItem>
-            <SelectItem value="Quality">Quality</SelectItem>
-            <SelectItem value="Welding">Welding</SelectItem>
-            <SelectItem value="CNC">CNC</SelectItem>
-            <SelectItem value="Maintenance">Maintenance</SelectItem>
-            <SelectItem value="Safety">Safety</SelectItem>
+            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="safety">Safety</SelectItem>
+            <SelectItem value="technical">Technical</SelectItem>
+            <SelectItem value="process">Process</SelectItem>
+            <SelectItem value="soft_skills">Soft Skills</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -268,13 +427,21 @@ function TrainingTab() {
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mb-2">{training.target}</p>
+                  {training.description && (
+                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{training.description}</p>
+                  )}
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <Users className="h-3 w-3" /> {training.participants} participants
+                      <Users className="h-3 w-3" /> {training.participants || "N/A"} participants
                     </span>
                     <span className="flex items-center gap-1">
                       <BarChart3 className="h-3 w-3" /> {training.duration}
                     </span>
+                    {training.estimatedImpact && (
+                      <span className="flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3" /> {training.estimatedImpact}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <Button variant="outline" size="sm">
@@ -284,31 +451,69 @@ function TrainingTab() {
             </CardContent>
           </Card>
         ))}
+        {filteredSuggestions.length === 0 && (
+          <Card className="glass border-border/50">
+            <CardContent className="p-8 text-center text-muted-foreground">
+              No training suggestions match the selected filter.
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
 }
 
-function DepartmentTab() {
-  const insights = MOCK_INSIGHTS.department_insights;
+function DepartmentTab({ data, isLoading }: { data: AiOrgInsightsResponse | undefined; isLoading: boolean }) {
+  const departmentInsights = transformDepartmentInsights(data?.readiness_summaries || []);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <FallbackBanner />
+        <div className="grid gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <Skeleton key={i} className="h-20 bg-muted rounded-card" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <FallbackBanner />
 
       <div className="grid gap-4">
-        {insights.map((dept) => (
+        {departmentInsights.map((dept) => (
           <Card key={dept.department} className="glass border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="font-medium">{dept.department}</h4>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
+                  <h4 className="font-medium">{dept.department}</h4>
+                </div>
                 <Badge variant={dept.readiness >= 80 ? "default" : dept.readiness >= 65 ? "secondary" : "destructive"}>
                   {dept.readiness}% Ready
                 </Badge>
               </div>
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-4 text-xs text-muted-foreground mb-2">
                 <span>Top Gap: <strong>{dept.topGap}</strong></span>
-                <span>{dept.employees_affected} employees affected</span>
+                <span>{dept.employees_affected} employees</span>
+                {dept.fully_qualified !== undefined && (
+                  <>
+                    <span className="text-success">✓ {dept.fully_qualified} Certified</span>
+                    <span className="text-warning">{dept.partially_qualified} Need Training</span>
+                    <span className="text-destructive">{dept.unqualified} Unqualified</span>
+                  </>
+                )}
+              </div>
+              <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-500"
+                  style={{ width: `${dept.readiness}%` }}
+                />
               </div>
             </CardContent>
           </Card>
@@ -319,11 +524,43 @@ function DepartmentTab() {
 }
 
 const AiPage = () => {
+  const { isAuthenticated } = useAuth();
+  const { data, isLoading, error, refetch } = useAiOrgInsights({ enabled: isAuthenticated });
+
+  if (!isAuthenticated) {
+    return (
+      <AppLayout>
+        <PageHeader
+          title="AI Assistant"
+          subtitle="Organization-wide competency insights powered by AI"
+        />
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+            <Lock className="h-7 w-7" />
+          </div>
+          <h3 className="text-lg font-medium mb-2">Authentication Required</h3>
+          <p className="text-sm text-muted-foreground max-w-md mb-6">
+            Please log in to access AI-powered organizational insights and training recommendations.
+          </p>
+          <Button asChild className="gap-2">
+            <Link to="/login"><Sparkles className="h-4 w-4" /> Sign In to Continue</Link>
+          </Button>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
       <PageHeader
         title="AI Assistant"
         subtitle="Organization-wide competency insights powered by AI"
+        action={
+          <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isLoading} className="gap-2">
+            <RefreshCw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
+            Refresh
+          </Button>
+        }
       />
 
       <Tabs defaultValue="insights" className="space-y-6">
@@ -334,15 +571,15 @@ const AiPage = () => {
         </TabsList>
 
         <TabsContent value="insights">
-          <InsightsTab />
+          <InsightsTab data={data} isLoading={isLoading} error={error} />
         </TabsContent>
 
         <TabsContent value="training">
-          <TrainingTab />
+          <TrainingTab data={data} isLoading={isLoading} />
         </TabsContent>
 
         <TabsContent value="departments">
-          <DepartmentTab />
+          <DepartmentTab data={data} isLoading={isLoading} />
         </TabsContent>
       </Tabs>
     </AppLayout>

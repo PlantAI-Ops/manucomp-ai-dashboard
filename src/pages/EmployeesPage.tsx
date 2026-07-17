@@ -118,8 +118,8 @@ const EmployeesPage = () => {
   const departments = useMemo(() => {
     const deps = useMock
       ? [...new Set(MOCK_EMPLOYEES.map((e) => e.department))]
-      : [...new Set(apiData?.items.map((e) => e.department) ?? [])];
-    return deps.sort();
+      : [...new Set(apiData?.items.map((e) => e.department_name || e.department) ?? [])];
+    return deps.filter(Boolean).sort();
   }, [useMock, apiData]);
 
   const hasFilters = search || departmentFilter !== "all" || roleFilter !== "all" || statusFilter !== "all";
@@ -308,7 +308,7 @@ const EmployeesPage = () => {
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">{emp.email}</td>
                       <td className="px-4 py-3"><StatusBadge variant="info">{emp.role_name ?? emp.role_id}</StatusBadge></td>
-                      <td className="px-4 py-3"><StatusBadge variant="neutral">{emp.department}</StatusBadge></td>
+                      <td className="px-4 py-3"><StatusBadge variant="neutral">{emp.department_name || emp.department || "—"}</StatusBadge></td>
                       <td className="px-4 py-3 text-muted-foreground tabular-nums">{format(new Date(emp.hire_date), "MMM d, yyyy")}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">

@@ -12,6 +12,28 @@ export interface CompetencySummaryItem {
   safety_critical: boolean;
 }
 
+export interface EmployeeCompetencyHistoryItem {
+  competency_id: string;
+  competency_name: string;
+  category: string;
+  is_safety_critical: boolean;
+  latest_assessed_level: number | null;
+  latest_assessment_id: string | null;
+  latest_assessed_at: string | null;
+  required_level: number | null;
+  gap: number;
+}
+
+export interface EmployeeCompetencyHistoryResponse {
+  employee_id: string;
+  employee_name: string;
+  role_name: string;
+  department: string;
+  assessments: unknown[];
+  competencies: EmployeeCompetencyHistoryItem[];
+  total_assessments: number;
+}
+
 export interface EmployeeDetail {
   id: string;
   employee_number: string;
@@ -22,14 +44,15 @@ export interface EmployeeDetail {
   supervisor_id: string | null;
   supervisor_name: string | null;
   department: string;
+  department_id: string | null;
+  department_name?: string;
   hire_date: string;
   is_active: boolean;
   created_at: string;
   competency_summary: {
-    total: number;
+    total_required: number;
     assessed: number;
     gaps: number;
-    readiness_percentage: number;
   };
   competencies: CompetencySummaryItem[];
 }
@@ -97,10 +120,11 @@ export function buildMockEmployeeDetail(id: string): EmployeeDetail {
     supervisor_id: idx > 0 ? "emp-1" : null,
     supervisor_name: idx > 0 ? NAMES[0] : null,
     department: DEPARTMENTS[idx % 6],
+    department_id: `dept-${(idx % 6) + 1}`,
     hire_date: new Date(2020 + Math.floor(idx / 12), idx % 12, 1 + (idx % 28)).toISOString().split("T")[0],
     is_active: idx % 9 !== 0,
     created_at: new Date().toISOString(),
-    competency_summary: { total: competencies.length, assessed, gaps, readiness_percentage: readiness },
+    competency_summary: { total_required: competencies.length, assessed, gaps, readiness_percentage: readiness },
     competencies,
   };
 }
@@ -117,6 +141,47 @@ export function buildMockAssessments(employeeId: string): AssessmentRecord[] {
     assessed_at: new Date(2024, i, 10 + i).toISOString(),
     notes: i % 3 === 0 ? "Performed well under supervision" : null,
   }));
+}
+
+export function buildMockEmployeeCompetencyHistory(
+  employeeId: string
+): EmployeeCompetencyHistoryResponse {
+  const idx = parseInt(employeeId.replace("emp-", ""), 10) - 1;
+  const NAMES = [
+    "John Martinez", "Sarah Chen", "Mike Johnson", "Lisa Park", "David Brown",
+    "Emily Wilson", "Carlos Rivera", "Amy Thompson", "James Lee", "Maria Garcia",
+  ];
+  const ROLES = ["CNC Operator", "Quality Inspector", "Welder", "Assembly Tech", "Maintenance Tech", "Safety Officer"];
+  const DEPARTMENTS = ["Assembly", "Quality", "Welding", "CNC", "Maintenance", "Safety"];
+
+  const competencies: EmployeeCompetencyHistoryItem[] = COMPETENCY_NAMES.map((c, i) => {
+    const required = Math.floor(Math.random() * 3) + 3;
+    const assessed = Math.random() > 0.2 ? Math.floor(Math.random() * 5) + 1 : null;
+    const gap = assessed !== null ? Math.max(0, required - assessed) : required;
+    return {
+      competency_id: `comp-${i + 1}`,
+      competency_name: c,
+      category: CATEGORIES[i],
+      is_safety_critical: i === 8 || i === 9,
+      latest_assessed_level: assessed,
+      latest_assessment_id: assessed ? `assess-${i + 1}` : null,
+      latest_assessed_at: assessed ? new Date(2024, i % 12, 1 + (i % 28)).toISOString() : null,
+      required_level: required,
+      gap,
+    };
+  });
+
+  const totalAssessments = competencies.filter((c) => c.latest_assessed_level !== null).length;
+
+  return {
+    employee_id: employeeId,
+    employee_name: NAMES[idx % NAMES.length] || "Employee",
+    role_name: ROLES[idx % 6],
+    department: DEPARTMENTS[idx % 6],
+    assessments: [],
+    competencies,
+    total_assessments: totalAssessments,
+  };
 }
 
 export const MOCK_AI_INSIGHT: AiInsightResponse = {
@@ -143,15 +208,83 @@ export async function fetchEmployeeDetail(id: string): Promise<EmployeeDetail> {
 }
 
 export async function fetchAssessments(employeeId: string): Promise<AssessmentRecord[]> {
-  const { data } = await api.get<{ items: AssessmentRecord[] }>("/assessments", {
-    params: { employee_id: employeeId, page_size: 100 },
-  });
-  return data.items;
+  const { data } = await api.get<EmployeeCompetencyHistoryResponse>(
+    `/assessments/employee/${employeeId}/history`
+  );
+  // Transform the history endpoint response to AssessmentRecord[]
+  return (data.assessments ?? []).map((a: Record<string, unknown>) => ({
+    id: String(a.id ?? a.assessment_id ?? ""),
+    competency_name: String(a.competency_name ?? a.competency ?? ""),
+    level: Number(a.level ?? a.assessed_level ?? 0),
+    assessor_name: String(a.assessor_name ?? a.assessor ?? ""),
+    assessment_type: String(a.assessment_type ?? a.type ?? "Assessment"),
+    assessed_at: String(a.assessed_at ?? a.date ?? ""),
+    notes: a.notes ?? null,
+  }));
 }
 
 export async function generateAiInsight(employeeId: string): Promise<AiInsightResponse> {
   const { data } = await api.post<AiInsightResponse>("/ai/insight", { employee_id: employeeId });
+
+  // Normalize priority_actions: backend returns strings, frontend expects objects
+  const normalizedPriorityActions = (data.priority_actions ?? []).map((item) => {
+    if (typeof item === "string") {
+      // Infer severity from keywords in the action text
+      const lower = item.toLowerCase();
+      const severity: "critical" | "high" | "medium" =
+        lower.includes("critical") || lower.includes("immediate")
+          ? "critical"
+          : lower.includes("high") || lower.includes("urgent")
+            ? "high"
+            : "medium";
+      return { action: item, severity };
+    }
+    return item as { action: string; severity: "critical" | "high" | "medium" };
+  });
+
+  return {
+    summary: data.summary ?? "",
+    recommendations: data.recommendations ?? [],
+    priority_actions: normalizedPriorityActions,
+  };
+}
+
+export async function fetchEmployeeCompetencyHistory(
+  employeeId: string
+): Promise<EmployeeCompetencyHistoryResponse> {
+  const { data } = await api.get<EmployeeCompetencyHistoryResponse>(
+    `/assessments/employee/${employeeId}/history`
+  );
   return data;
+}
+
+export function useEmployeeCompetencyHistory(employeeId: string) {
+  const query = useQuery({
+    queryKey: ["employee-competency-history", employeeId],
+    queryFn: () => fetchEmployeeCompetencyHistory(employeeId),
+    enabled: !isMockId(employeeId),
+    retry: false,
+    throwOnError: false,
+  });
+
+  return {
+    ...query,
+    isMock: isMockId(employeeId),
+  };
+}
+
+export function useAssessments(employeeId: string) {
+  const query = useQuery({
+    queryKey: ["assessments", employeeId],
+    queryFn: () => fetchAssessments(employeeId),
+    enabled: !isMockId(employeeId),
+    retry: false,
+  });
+
+  return {
+    ...query,
+    isMock: isMockId(employeeId),
+  };
 }
 
 export function useEmployeeDetail(id: string) {
@@ -168,16 +301,42 @@ export function useEmployeeDetail(id: string) {
   };
 }
 
-export function useAssessments(employeeId: string) {
-  const query = useQuery({
-    queryKey: ["assessments", employeeId],
-    queryFn: () => fetchAssessments(employeeId),
-    enabled: !isMockId(employeeId),
+export function useEmployeeDetailWithHistory(id: string) {
+  const detailQuery = useQuery({
+    queryKey: ["employee-detail", id],
+    queryFn: () => fetchEmployeeDetail(id),
+    enabled: !isMockId(id),
     retry: false,
   });
 
+  const historyQuery = useQuery({
+    queryKey: ["employee-competency-history", id],
+    queryFn: () => fetchEmployeeCompetencyHistory(id),
+    enabled: !isMockId(id),
+    retry: false,
+    throwOnError: false,
+  });
+
+  const mergedData = detailQuery.data && historyQuery.data
+    ? {
+        ...detailQuery.data,
+        competencies: historyQuery.data.competencies.map((c) => ({
+          competency_id: c.competency_id,
+          competency_name: c.competency_name,
+          category: c.category,
+          required_level: c.required_level ?? 0,
+          assessed_level: c.latest_assessed_level,
+          gap: c.gap,
+          safety_critical: c.is_safety_critical,
+        })),
+      }
+    : detailQuery.data;
+
   return {
-    ...query,
-    isMock: isMockId(employeeId),
+    ...detailQuery,
+    data: mergedData,
+    isMock: isMockId(id),
+    isLoading: detailQuery.isLoading || historyQuery.isLoading,
+    isError: detailQuery.isError || historyQuery.isError,
   };
 }

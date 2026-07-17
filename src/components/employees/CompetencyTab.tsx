@@ -2,29 +2,48 @@ import { LevelIndicator } from "@/components/LevelIndicator";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Progress } from "@/components/ui/progress";
 import { AlertTriangle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import type { EmployeeDetail } from "@/services/employeeDetail";
+import type { CompetencySummaryItem, EmployeeCompetencyHistoryItem } from "@/services/employeeDetail";
 
-interface CompetencyTabProps {
-  employee: EmployeeDetail;
+type CompetencyItem = CompetencySummaryItem | EmployeeCompetencyHistoryItem;
+
+interface CompetencySummary {
+  total_required: number;
+  assessed: number;
+  gaps: number;
 }
 
-export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employee }) => {
-  const { competency_summary: summary, competencies } = employee;
+interface CompetencyTabProps {
+  competencies: CompetencyItem[];
+  summary?: CompetencySummary;
+  isLoading?: boolean;
+}
 
-  const readinessColor =
-    summary.readiness_percentage >= 80
-      ? "text-success"
-      : summary.readiness_percentage >= 50
-        ? "text-warning"
-        : "text-destructive";
+function getAssessedLevel(comp: CompetencyItem): number | null {
+  return "assessed_level" in comp ? comp.assessed_level : comp.latest_assessed_level;
+}
 
-  const progressColor =
-    summary.readiness_percentage >= 80
-      ? "[&>div]:bg-success"
-      : summary.readiness_percentage >= 50
-        ? "[&>div]:bg-warning"
-        : "[&>div]:bg-destructive";
+function getSafetyCritical(comp: CompetencyItem): boolean {
+  return "safety_critical" in comp ? comp.safety_critical : comp.is_safety_critical;
+}
+
+export const CompetencyTab: React.FC<CompetencyTabProps> = ({ competencies = [], summary, isLoading }) => {
+
+  const readinessPercentage = summary?.total_required
+    ? Math.round(((summary.total_required - summary.gaps) / summary.total_required) * 100)
+    : competencies.length > 0
+      ? Math.round(((competencies.length - competencies.filter((c) => c.gap > 0).length) / competencies.length) * 100)
+      : 0;
+
+  const readinessColor = readinessPercentage >= 80 ? "text-success" : readinessPercentage >= 60 ? "text-warning" : "text-destructive";
+  const progressColor = readinessPercentage >= 80 ? "bg-success" : readinessPercentage >= 60 ? "bg-warning" : "bg-destructive";
+
+  const displaySummary = summary || {
+    total_required: competencies.length,
+    assessed: competencies.filter((c) => getAssessedLevel(c) !== null).length,
+    gaps: competencies.filter((c) => c.gap > 0).length,
+  };
 
   return (
     <div className="space-y-6">
@@ -32,23 +51,23 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employee }) => {
       <div className="glass rounded-card p-5">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           <div className="text-center">
-            <p className="text-2xl font-bold">{summary.total}</p>
+            <p className="text-2xl font-bold">{displaySummary.total_required}</p>
             <p className="text-xs text-muted-foreground">Total Required</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold">{summary.assessed}</p>
+            <p className="text-2xl font-bold">{displaySummary.assessed}</p>
             <p className="text-xs text-muted-foreground">Assessed</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-destructive">{summary.gaps}</p>
+            <p className="text-2xl font-bold text-destructive">{displaySummary.gaps}</p>
             <p className="text-xs text-muted-foreground">Gaps</p>
           </div>
           <div className="text-center">
             <p className={cn("text-2xl font-bold", readinessColor)}>
-              {summary.readiness_percentage}%
+              {readinessPercentage}%
             </p>
             <p className="text-xs text-muted-foreground mb-2">Readiness</p>
-            <Progress value={summary.readiness_percentage} className={cn("h-2", progressColor)} />
+            <Progress value={readinessPercentage} className={cn("h-2", progressColor)} />
           </div>
         </div>
       </div>
@@ -68,18 +87,29 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employee }) => {
               </tr>
             </thead>
             <tbody>
-              {competencies.map((comp) => (
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-border/30">
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-3/4" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/2" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/4" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/4" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/4" /></td>
+                    <td className="px-4 py-3"><Skeleton className="h-4 w-1/4" /></td>
+                  </tr>
+                ))
+              ) : competencies.map((comp) => (
                 <tr key={comp.competency_id} className="border-b border-border/30 last:border-0 hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 font-medium">{comp.competency_name}</td>
                   <td className="px-4 py-3">
                     <StatusBadge variant="neutral">{comp.category}</StatusBadge>
                   </td>
                   <td className="px-4 py-3">
-                    <LevelIndicator level={comp.required_level} size="sm" />
+                    <LevelIndicator level={comp.required_level ?? 0} size="sm" />
                   </td>
                   <td className="px-4 py-3">
-                    {comp.assessed_level !== null ? (
-                      <LevelIndicator level={comp.assessed_level} size="sm" />
+                    {getAssessedLevel(comp) !== null ? (
+                      <LevelIndicator level={getAssessedLevel(comp)!} size="sm" />
                     ) : (
                       <span className="text-xs text-muted-foreground italic">Not Assessed</span>
                     )}
@@ -99,7 +129,7 @@ export const CompetencyTab: React.FC<CompetencyTabProps> = ({ employee }) => {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {comp.safety_critical && (
+                    {getSafetyCritical(comp) && (
                       <AlertTriangle className="h-4 w-4 text-warning" />
                     )}
                   </td>

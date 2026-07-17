@@ -8,6 +8,7 @@ import { LevelIndicator } from "@/components/LevelIndicator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { AssessmentFormModal } from "@/components/assessments/AssessmentFormModal";
+import { AssessmentDetailModal } from "@/components/assessments/AssessmentDetailModal";
 import {
   Select,
   SelectContent,
@@ -76,6 +77,7 @@ export default function AssessmentsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<AssessmentListItem | null>(null);
   const [deleteItem, setDeleteItem] = useState<AssessmentListItem | null>(null);
+  const [detailItem, setDetailItem] = useState<AssessmentListItem | null>(null);
 
   const queryClient = useQueryClient();
   const { data, isLoading, isError } = useAssessments(filters);
@@ -278,10 +280,10 @@ export default function AssessmentsPage() {
                       <TableCell>
                         <LevelIndicator level={a.assessed_level} size="sm" />
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{a.assessor_name}</TableCell>
+                      <TableCell className="text-muted-foreground">{a.assessor_name || "—"}</TableCell>
                       <TableCell>
                         <StatusBadge variant={ASSESSOR_TYPE_VARIANTS[a.assessor_type] || "neutral"}>
-                          {a.assessor_type.charAt(0).toUpperCase() + a.assessor_type.slice(1)}
+                          {a.assessor_type ? a.assessor_type.charAt(0).toUpperCase() + a.assessor_type.slice(1) : "—"}
                         </StatusBadge>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
@@ -301,29 +303,34 @@ export default function AssessmentsPage() {
                           <span className="text-muted-foreground/50">—</span>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => { setEditItem(a); setModalOpen(true); }}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-destructive hover:text-destructive"
-                            onClick={() => setDeleteItem(a)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                       <TableCell>
+                         <div className="flex items-center justify-end gap-1">
+                           <Button
+                             variant="ghost"
+                             size="icon"
+                             className="h-8 w-8"
+                             onClick={() => setDetailItem(a)}
+                           >
+                             <Eye className="h-4 w-4" />
+                           </Button>
+                           <Button
+                             variant="ghost"
+                             size="icon"
+                             className="h-8 w-8"
+                             onClick={() => { setEditItem(a); setModalOpen(true); }}
+                           >
+                             <Pencil className="h-4 w-4" />
+                           </Button>
+                           <Button
+                             variant="ghost"
+                             size="icon"
+                             className="h-8 w-8 text-destructive hover:text-destructive"
+                             onClick={() => setDeleteItem(a)}
+                           >
+                             <Trash2 className="h-4 w-4" />
+                           </Button>
+                         </div>
+                       </TableCell>
                     </TableRow>
                   );
                 })
@@ -382,6 +389,12 @@ export default function AssessmentsPage() {
         onOpenChange={setModalOpen}
         assessment={editItem}
         onSuccess={() => queryClient.invalidateQueries({ queryKey: ["assessments"] })}
+      />
+
+      <AssessmentDetailModal
+        open={!!detailItem}
+        onOpenChange={open => !open && setDetailItem(null)}
+        assessment={detailItem}
       />
 
       <ConfirmDialog

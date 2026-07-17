@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import api from "@/services/api";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  useEmployeeDetail,
+  useEmployeeDetailWithHistory,
   buildMockEmployeeDetail,
   type EmployeeDetail,
 } from "@/services/employeeDetail";
@@ -38,11 +38,9 @@ const EmployeeDetailPage = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: apiEmployee, isLoading, isError, isMock } = useEmployeeDetail(id!);
-  const employee: EmployeeDetail | null = apiEmployee ?? (isError ? buildMockEmployeeDetail(id!) : null);
-
-  const hasValidCompetencies = employee?.competencies && Array.isArray(employee.competencies);
-  const employeeData: EmployeeDetail | null = hasValidCompetencies ? employee : (employee ? buildMockEmployeeDetail(id!) : null);
+  const { data: apiEmployee, isLoading, isError, isMock } = useEmployeeDetailWithHistory(id!);
+  const mockEmployee = isError ? buildMockEmployeeDetail(id!) : null;
+  const employee: EmployeeDetail | null = apiEmployee || mockEmployee;
 
   const [editOpen, setEditOpen] = useState(false);
   const [toggling, setToggling] = useState(false);
@@ -50,11 +48,11 @@ const EmployeeDetailPage = () => {
   const isManagerOrAdmin = user?.role === "admin" || user?.role === "manager";
 
   const handleToggleActive = async () => {
-    if (!employeeData) return;
+    if (!employee) return;
     setToggling(true);
     try {
-      await api.patch(`/employees/${employeeData.id}`, { is_active: !employeeData.is_active });
-      toast.success(employeeData.is_active ? "Employee deactivated" : "Employee activated");
+      await api.patch(`/employees/${employee.id}`, { is_active: !employee.is_active });
+      toast.success(employee.is_active ? "Employee deactivated" : "Employee activated");
       queryClient.invalidateQueries({ queryKey: ["employee-detail", id] });
     } catch {
       toast.error("Failed to update status");
@@ -66,7 +64,7 @@ const EmployeeDetailPage = () => {
   const getInitials = (name: string) =>
     name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
-  if (isLoading || !employeeData) {
+  if (isLoading || !employee) {
     return (
       <AppLayout>
         <div className="space-y-6 animate-fade-in">
@@ -80,18 +78,19 @@ const EmployeeDetailPage = () => {
 
   // Convert to EmployeeListItem shape for the edit modal
   const editableEmployee = {
-    id: employeeData.id,
-    employee_number: employeeData.employee_number,
-    full_name: employeeData.full_name,
-    email: employeeData.email,
-    role_id: employeeData.role_id,
-    role_name: employeeData.role_name,
-    supervisor_id: employeeData.supervisor_id,
-    supervisor_name: employeeData.supervisor_name,
-    department: employeeData.department,
-    hire_date: employeeData.hire_date,
-    is_active: employeeData.is_active,
-    created_at: employeeData.created_at,
+    id: employee.id,
+    employee_number: employee.employee_number,
+    full_name: employee.full_name,
+    email: employee.email,
+    role_id: employee.role_id,
+    role_name: employee.role_name,
+    supervisor_id: employee.supervisor_id,
+    supervisor_name: employee.supervisor_name,
+    department: employee.department,
+    department_id: employee.department_id,
+    hire_date: employee.hire_date,
+    is_active: employee.is_active,
+    created_at: employee.created_at,
   };
 
   return (
@@ -117,20 +116,20 @@ const EmployeeDetailPage = () => {
           <div className="flex flex-col sm:flex-row gap-6">
             {/* Avatar */}
             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-2xl font-bold text-primary">
-              {getInitials(employeeData.full_name)}
+              {getInitials(employee.full_name)}
             </div>
 
             {/* Info */}
             <div className="flex-1 space-y-3">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-bold">{employeeData.full_name}</h1>
+                  <h1 className="text-2xl font-bold">{employee.full_name}</h1>
                   <div className="mt-1 flex flex-wrap items-center gap-2">
-                    <StatusBadge variant="info">{employeeData.role_name ?? employeeData.role_id}</StatusBadge>
-                    <StatusBadge variant="neutral">{employeeData.department}</StatusBadge>
+                    <StatusBadge variant="info">{employee.role_name ?? employee.role_id}</StatusBadge>
+                    <StatusBadge variant="neutral">{employee.department}</StatusBadge>
                     <div className="flex items-center gap-1.5">
-                      <StatusDot variant={employeeData.is_active ? "success" : "danger"} />
-                      <span className="text-sm">{employeeData.is_active ? "Active" : "Inactive"}</span>
+                      <StatusDot variant={employee.is_active ? "success" : "danger"} />
+                      <span className="text-sm">{employee.is_active ? "Active" : "Inactive"}</span>
                     </div>
                   </div>
                 </div>
@@ -139,31 +138,31 @@ const EmployeeDetailPage = () => {
                     <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
                   </Button>
                   <Button
-                    variant={employeeData.is_active ? "outline" : "default"}
+                    variant={employee.is_active ? "outline" : "default"}
                     size="sm"
                     onClick={handleToggleActive}
                     disabled={toggling || isMock}
-                    className={employeeData.is_active ? "text-destructive border-destructive/30 hover:bg-destructive/10" : ""}
+                    className={employee.is_active ? "text-destructive border-destructive/30 hover:bg-destructive/10" : ""}
                   >
                     <Power className="mr-1 h-3.5 w-3.5" />
-                    {employeeData.is_active ? "Deactivate" : "Activate"}
+                    {employee.is_active ? "Deactivate" : "Activate"}
                   </Button>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5">
-                  <Mail className="h-3.5 w-3.5" /> {employeeData.email}
+                  <Mail className="h-3.5 w-3.5" /> {employee.email}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Hash className="h-3.5 w-3.5" /> {employeeData.employee_number}
+                  <Hash className="h-3.5 w-3.5" /> {employee.employee_number}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5" /> Hired {format(new Date(employeeData.hire_date), "MMM d, yyyy")}
+                  <Calendar className="h-3.5 w-3.5" /> Hired {format(new Date(employee.hire_date), "MMM d, yyyy")}
                 </span>
-                {employeeData.supervisor_name && (
+                {employee.supervisor_name && (
                   <span className="inline-flex items-center gap-1.5">
-                    <UserCheck className="h-3.5 w-3.5" /> {employeeData.supervisor_name}
+                    <UserCheck className="h-3.5 w-3.5" /> {employee.supervisor_name}
                   </span>
                 )}
               </div>
@@ -180,16 +179,20 @@ const EmployeeDetailPage = () => {
           </TabsList>
 
           <TabsContent value="competencies">
-            <CompetencyTab employee={employeeData} />
+            <CompetencyTab 
+              competencies={employee.competencies} 
+              summary={employee.competency_summary}
+              isLoading={false} 
+            />
           </TabsContent>
 
           <TabsContent value="assessments">
-            <AssessmentHistoryTab employeeId={employeeData.id} />
+            <AssessmentHistoryTab employeeId={employee.id} />
           </TabsContent>
 
           {isManagerOrAdmin && (
             <TabsContent value="ai">
-              <AiInsightsTab employeeId={employeeData.id} />
+              <AiInsightsTab employeeId={employee.id} />
             </TabsContent>
           )}
         </Tabs>

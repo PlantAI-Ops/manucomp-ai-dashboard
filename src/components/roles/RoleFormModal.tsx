@@ -255,7 +255,7 @@ export const RoleFormModal = ({ open, onOpenChange, role }: RoleFormModalProps) 
                         .map((c) => (
                           <SelectItem key={c.id} value={c.id}>
                             {c.name}
-                            <span className="ml-1 text-muted-foreground">({c.category})</span>
+                            <span className="ml-1 text-muted-foreground">({c.displayCategory})</span>
                           </SelectItem>
                         ))}
                     </SelectContent>

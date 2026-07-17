@@ -11,6 +11,8 @@ export interface EmployeeListItem {
   supervisor_id: string | null;
   supervisor_name: string | null;
   department: string;
+  department_name?: string;
+  department_id: string | null;
   hire_date: string;
   is_active: boolean;
   created_at: string;

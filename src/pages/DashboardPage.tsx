@@ -18,6 +18,11 @@ import {
   MOCK_DASHBOARD,
   type DashboardSummary,
 } from "@/services/dashboard";
+import { useAiOrgInsights, type AiOrgInsightsResponse, type CriticalGapDetail } from "@/services/analytics";
+
+function getGapValue(gap: CriticalGapDetail): number {
+  return gap.gap ?? gap.gap_level ?? gap.gap_size ?? gap.level_gap ?? 0;
+}
 
 const DashboardPage = () => {
   const { data, isLoading, isError } = useQuery<DashboardSummary>({
@@ -26,8 +31,15 @@ const DashboardPage = () => {
     retry: false,
   });
 
+  const { data: aiData } = useAiOrgInsights({ enabled: true });
+
   const useMock = isError || !data;
   const summary = data ?? MOCK_DASHBOARD;
+
+  // Use AI insights for critical gaps and gap details
+  const criticalGaps = aiData?.workforce_readiness_report?.critical_gaps ?? summary.critical_gaps;
+  const criticalGapDetails: CriticalGapDetail[] = aiData?.critical_gap_details ?? summary.critical_gap_details ?? [];
+  const highGapDetails: CriticalGapDetail[] = aiData?.high_gap_details ?? [];
 
   return (
     <AppLayout>
@@ -193,9 +205,16 @@ const DashboardPage = () => {
             <AlertTriangle className="h-4 w-4 text-destructive" />
             Critical Gaps
           </CardTitle>
-          <Badge variant="destructive" className="text-xs">
-            {summary.critical_gap_details?.length ?? 0} issues
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="destructive" className="text-xs">
+              {criticalGaps} critical
+            </Badge>
+            {highGapDetails.length > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {highGapDetails.length} high
+              </Badge>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -206,7 +225,7 @@ const DashboardPage = () => {
             </div>
           ) : (
             <div className="divide-y divide-border/40">
-              {(summary.critical_gap_details ?? []).map((gap, idx) => (
+              {criticalGapDetails.map((gap, idx) => (
                 <div
                   key={idx}
                   className="flex flex-wrap items-center justify-between gap-2 py-3 first:pt-0 last:pb-0"
@@ -221,7 +240,7 @@ const DashboardPage = () => {
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground">Gap: {gap.gap}</span>
+                    <span className="text-xs text-muted-foreground">Gap: {getGapValue(gap)}</span>
                     <StatusBadge variant={gap.severity === "critical" ? "danger" : "warning"}>
                       {gap.severity}
                     </StatusBadge>
@@ -231,6 +250,34 @@ const DashboardPage = () => {
                   </div>
                 </div>
               ))}
+              {highGapDetails.map((gap, idx) => (
+                <div
+                  key={`high-${idx}`}
+                  className="flex flex-wrap items-center justify-between gap-2 py-3 border-t border-border/40"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="font-medium text-sm truncate">{gap.employee_name}</span>
+                    <span className="text-muted-foreground text-xs truncate hidden sm:inline">
+                      {gap.competency_name}
+                    </span>
+                    <span className="text-muted-foreground text-xs sm:hidden truncate">
+                      {gap.competency_name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-muted-foreground">Gap: {getGapValue(gap)}</span>
+                    <StatusBadge variant={gap.severity === "critical" ? "danger" : "warning"}>
+                      {gap.severity}
+                    </StatusBadge>
+                    <Button variant="ghost" size="sm" className="h-7 text-xs">
+                      <Eye className="mr-1 h-3 w-3" /> Details
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {criticalGapDetails.length === 0 && highGapDetails.length === 0 && (
+                <p className="text-sm text-muted-foreground py-4 text-center">No critical or high gaps found</p>
+              )}
             </div>
           )}
         </CardContent>
