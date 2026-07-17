@@ -63,15 +63,25 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top bar */}
           <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center gap-2 sm:gap-4 border-b border-border bg-background/90 backdrop-blur-md px-3 sm:px-4">
-            {/* Left: sidebar trigger + app name */}
+{/* Left: sidebar trigger + app name */}
             <div className="flex items-center gap-2 sm:gap-3">
               <SidebarTrigger className="hidden sm:flex text-muted-foreground hover:text-foreground transition-colors" />
               <div className="flex items-center gap-2">
                 <PlantAiLogo size={24} className="sm:hidden" />
-                <span className="text-sm font-semibold tracking-tight text-foreground">PlantAI</span>
-                <span className="hidden md:inline text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground border-l border-border pl-2">
-                  Ops &amp; Automation
-                </span>
+                <div className="flex flex-col leading-tight">
+                  <span className="text-sm font-semibold tracking-tight text-foreground">PlantAI</span>
+                  <span className="hidden md:inline flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground border-l border-border pl-2">
+                    <span>Ops & Automation</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-semibold text-primary">
+                      <span className="relative flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                      ManuComp AI
+                    </span>
+                  </span>
+                  <span className="sm:hidden inline-flex items-center gap-1.5 mt-0.5 text-[10px] font-medium uppercase tracking-[0.2em] text-primary">
+                    <span className="relative flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                    ManuComp AI
+                  </span>
+</div>
               </div>
             </div>
 

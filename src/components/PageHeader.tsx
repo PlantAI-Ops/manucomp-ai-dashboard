@@ -13,6 +13,7 @@ interface PageHeaderProps {
   subtitle?: string;
   breadcrumbs?: BreadcrumbItem[];
   actions?: React.ReactNode;
+  productBadge?: string;
   className?: string;
 }
 
@@ -48,6 +49,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           </h1>
           {subtitle && (
             <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+          )}
+          {productBadge && (
+            <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary">
+              <span className="relative flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              {productBadge}
+            </span>
           )}
         </div>
         {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}

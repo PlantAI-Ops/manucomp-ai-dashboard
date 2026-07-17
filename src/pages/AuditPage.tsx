@@ -127,6 +127,7 @@ export default function AuditPage() {
         <PageHeader
           title="Audit Log"
           subtitle="System activity and change history"
+          productBadge="ManuComp AI"
         />
 
         {/* Filters */}

@@ -66,14 +66,18 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
-      <SidebarHeader className="p-4">
+<SidebarHeader className="p-4">
         <div className="flex items-center gap-2.5">
           <PlantAiLogo size={28} />
           {!collapsed && (
             <div className="flex flex-col leading-tight">
               <span className="text-sm font-semibold tracking-tight text-sidebar-foreground">PlantAI</span>
               <span className="text-[9px] font-medium uppercase tracking-[0.18em] text-muted-foreground mt-0.5">
-                Ops &amp; Automation
+                Ops & Automation
+              </span>
+              <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-semibold text-primary">
+                <span className="relative flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                ManuComp AI
               </span>
             </div>
           )}

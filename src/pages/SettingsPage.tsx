@@ -59,7 +59,7 @@ const SettingsPage: React.FC = () => {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Settings" subtitle="Manage your profile and application preferences" />
+        <PageHeader title="Settings" subtitle="Manage your profile and application preferences" productBadge="ManuComp AI" />
 
         {/* Section 1: User Profile */}
         <Card>

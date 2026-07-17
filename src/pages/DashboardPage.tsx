@@ -46,6 +46,7 @@ const DashboardPage = () => {
       <PageHeader
         title="Dashboard"
         subtitle="Manufacturing competency overview"
+        productBadge="ManuComp AI"
       />
 
       {/* Stat Cards */}

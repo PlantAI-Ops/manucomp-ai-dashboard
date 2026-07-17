@@ -4,7 +4,7 @@ AI-powered manufacturing employee competency management system for tracking skil
 
 ## Overview
 
-ManuComp AI is a comprehensive dashboard application designed for manufacturing organizations to manage and track employee competencies. The system enables managers to assess employee skills, track competency levels, generate AI-powered insights, and make data-driven decisions about workforce development.
+**ManuComp AI** is a product of the **PlantAI Ops & Automation** platform — a comprehensive dashboard application designed for manufacturing organizations to manage and track employee competencies. The system enables managers to assess employee skills, track competency levels, generate AI-powered insights, and make data-driven decisions about workforce development.
 
 ## Features
 
