@@ -3,6 +3,8 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { PlantAiLogo } from "@/components/PlantAiLogo";
 import { useAuth } from "@/hooks/useAuth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Input } from "@/components/ui/input";
@@ -14,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, Search, User, LogOut, Settings } from "lucide-react";
+import { Bell, Search, LogOut, Settings } from "lucide-react";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -53,20 +55,24 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full bg-background">
         {/* Sidebar hidden on mobile, visible on sm+ */}
         <div className="hidden sm:block">
           <AppSidebar />
         </div>
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top bar */}
-          <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center gap-2 sm:gap-4 border-b border-border/50 bg-background/80 backdrop-blur-md px-3 sm:px-4">
+          <header className="sticky top-0 z-30 flex h-14 sm:h-16 items-center gap-2 sm:gap-4 border-b border-border bg-background/90 backdrop-blur-md px-3 sm:px-4">
             {/* Left: sidebar trigger + app name */}
             <div className="flex items-center gap-2 sm:gap-3">
               <SidebarTrigger className="hidden sm:flex text-muted-foreground hover:text-foreground transition-colors" />
-              <span className="text-sm font-semibold text-foreground">
-                ManuComp <span className="text-primary">AI</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <PlantAiLogo size={24} className="sm:hidden" />
+                <span className="text-sm font-semibold tracking-tight text-foreground">PlantAI</span>
+                <span className="hidden md:inline text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground border-l border-border pl-2">
+                  Ops &amp; Automation
+                </span>
+              </div>
             </div>
 
             {/* Center: search — hidden on small mobile */}
@@ -77,27 +83,29 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search employees, roles, competencies…"
-                  className="pl-9 bg-muted/50 border-border/50 rounded-input h-9 text-sm"
+                  className="pl-9 bg-muted/50 border-border rounded-input h-9 text-sm focus-visible:ring-accent"
                 />
               </div>
             </div>
 
             {/* Right: notifications + user */}
             <div className="flex items-center gap-1 sm:gap-2 ml-auto">
+              <ThemeToggle />
+
               {/* Notification bell */}
-              <button className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors active:scale-95 touch-target">
+              <button className="relative flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors active:scale-95 touch-target">
                 <Bell className="h-4 w-4" />
-                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive" />
+                <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-accent" />
               </button>
 
               {/* User dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-semibold hover:bg-primary/25 transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-target">
+                  <button className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent touch-target">
                     {initials}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="glass w-56">
+                <DropdownMenuContent align="end" className="w-56 border-border shadow-md">
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col gap-1">
                       <p className="text-sm font-medium">{user?.full_name || "User"}</p>

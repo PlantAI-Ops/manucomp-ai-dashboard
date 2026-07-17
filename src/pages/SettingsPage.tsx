@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { StatusDot } from "@/components/StatusDot";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import api from "@/services/api";
@@ -17,9 +18,9 @@ import { User, Moon, Sun, Bell, Wifi, Info, Pencil, Check, X } from "lucide-reac
 
 const SettingsPage: React.FC = () => {
   const { user, userLoading } = useAuth();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [editingName, setEditingName] = useState(false);
   const [fullName, setFullName] = useState("");
-  const [darkMode, setDarkMode] = useState(() => document.documentElement.classList.contains("dark"));
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [pushNotifs, setPushNotifs] = useState(false);
   const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking");
@@ -35,10 +36,8 @@ const SettingsPage: React.FC = () => {
       .catch(() => setApiStatus("offline"));
   }, []);
 
-  const toggleDarkMode = (enabled: boolean) => {
-    setDarkMode(enabled);
-    document.documentElement.classList.toggle("dark", enabled);
-  };
+  const darkMode = theme === "dark";
+  const toggleDarkMode = () => toggleTheme();
 
   const handleSaveName = () => {
     toast.info("Profile update endpoint not yet available");
