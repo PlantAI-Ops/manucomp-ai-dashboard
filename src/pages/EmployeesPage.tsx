@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ import {
   Trash2,
   X,
   Users,
+  Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -184,10 +185,17 @@ const EmployeesPage = () => {
         title="Employees"
         subtitle="Manage manufacturing personnel"
         actions={
-          <Button size="sm" onClick={openCreate}>
-            <Plus className="mr-1 h-4 w-4" />
-            Add Employee
-          </Button>
+          <>
+            <Button variant="outline" size="sm" asChild className="gap-1.5">
+              <Link to="/bulk-upload?entity=employees">
+                <Upload className="h-4 w-4" /> Bulk Upload
+              </Link>
+            </Button>
+            <Button size="sm" onClick={openCreate}>
+              <Plus className="mr-1 h-4 w-4" />
+              Add Employee
+            </Button>
+          </>
         }
       />
 

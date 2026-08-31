@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import {
   Plus, Search, AlertTriangle, Eye, Pencil, Trash2,
-  LayoutGrid, LayoutList, ChevronLeft, ChevronRight, X,
+  LayoutGrid, LayoutList, ChevronLeft, ChevronRight, X, Upload,
 } from "lucide-react";
 import {
   useCompetenciesPaginated, useCreateCompetency, useUpdateCompetency, useDeleteCompetency,
@@ -112,9 +113,16 @@ const CompetenciesPage: React.FC = () => {
         title="Competencies"
         subtitle="Skills and knowledge areas"
         actions={
-          <Button onClick={handleCreate} className="gap-1.5">
-            <Plus className="h-4 w-4" /> Add Competency
-          </Button>
+          <>
+            <Button variant="outline" asChild className="gap-1.5">
+              <Link to="/bulk-upload?entity=competencies">
+                <Upload className="h-4 w-4" /> Bulk Upload
+              </Link>
+            </Button>
+            <Button onClick={handleCreate} className="gap-1.5">
+              <Plus className="h-4 w-4" /> Add Competency
+            </Button>
+          </>
         }
       />
 

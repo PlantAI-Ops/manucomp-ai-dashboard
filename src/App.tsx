@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NetworkErrorToast } from "@/components/NetworkErrorToast";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -22,6 +23,7 @@ import AnalyticsPage from "./pages/AnalyticsPage";
 import AiPage from "./pages/AiPage";
 import DepartmentsPage from "./pages/DepartmentsPage";
 import SettingsPage from "./pages/SettingsPage";
+import BulkUploadPage from "./pages/BulkUploadPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -47,20 +49,21 @@ const App = () => (
           <AuthProvider>
             <NetworkErrorToast />
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/employees" element={<EmployeesPage />} />
-              <Route path="/employees/:id" element={<EmployeeDetailPage />} />
-              <Route path="/roles" element={<RolesPage />} />
-              <Route path="/roles/:id" element={<RoleDetailPage />} />
-              <Route path="/competencies" element={<CompetenciesPage />} />
-              <Route path="/departments" element={<DepartmentsPage />} />
-              <Route path="/assessments" element={<AssessmentsPage />} />
-              <Route path="/assessments/bulk" element={<BulkAssessmentPage />} />
-              <Route path="/audit" element={<AuditPage />} />
-              <Route path="/analytics" element={<AnalyticsPage />} />
-              <Route path="/ai" element={<AiPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/" element={<ProtectedRoute><Navigate to="/dashboard" replace /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+              <Route path="/employees" element={<ProtectedRoute><EmployeesPage /></ProtectedRoute>} />
+              <Route path="/employees/:id" element={<ProtectedRoute><EmployeeDetailPage /></ProtectedRoute>} />
+              <Route path="/roles" element={<ProtectedRoute><RolesPage /></ProtectedRoute>} />
+              <Route path="/roles/:id" element={<ProtectedRoute><RoleDetailPage /></ProtectedRoute>} />
+              <Route path="/competencies" element={<ProtectedRoute><CompetenciesPage /></ProtectedRoute>} />
+              <Route path="/departments" element={<ProtectedRoute><DepartmentsPage /></ProtectedRoute>} />
+              <Route path="/assessments" element={<ProtectedRoute><AssessmentsPage /></ProtectedRoute>} />
+              <Route path="/assessments/bulk" element={<ProtectedRoute><BulkAssessmentPage /></ProtectedRoute>} />
+              <Route path="/audit" element={<ProtectedRoute><AuditPage /></ProtectedRoute>} />
+              <Route path="/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
+              <Route path="/ai" element={<ProtectedRoute><AiPage /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+              <Route path="/bulk-upload" element={<ProtectedRoute><BulkUploadPage /></ProtectedRoute>} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="*" element={<NotFound />} />

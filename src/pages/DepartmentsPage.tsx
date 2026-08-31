@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Plus, Search, Users, Pencil, Trash2, LayoutGrid, LayoutList, ChevronLeft, ChevronRight, X, Building2,
+  Plus, Search, Users, Pencil, Trash2, LayoutGrid, LayoutList, ChevronLeft, ChevronRight, X, Building2, Upload,
 } from "lucide-react";
 import {
   useDepartments, useCreateDepartment, useUpdateDepartment, useDeleteDepartment,
@@ -118,9 +119,16 @@ const DepartmentPage: React.FC = () => {
         title="Departments"
         subtitle="Organizational units and teams"
         actions={
-          <Button onClick={handleCreate} className="gap-1.5">
-            <Plus className="h-4 w-4" /> Add Department
-          </Button>
+          <>
+            <Button variant="outline" asChild className="gap-1.5">
+              <Link to="/bulk-upload?entity=departments">
+                <Upload className="h-4 w-4" /> Bulk Upload
+              </Link>
+            </Button>
+            <Button onClick={handleCreate} className="gap-1.5">
+              <Plus className="h-4 w-4" /> Add Department
+            </Button>
+          </>
         }
       />
 

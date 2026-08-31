@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useEmployeesForSelect } from "@/services/employees";
 import { useDepartments } from "@/services/departments";
@@ -92,8 +93,8 @@ function GapAnalysisTab() {
   const { data: employeesData } = useEmployeesForSelect();
   const employees = employeesData ?? [];
 
-  const { data: apiData } = useGapAnalysis(selectedEmpId || undefined);
-  const gapData: GapAnalysis | null = apiData || (selectedEmpId ? buildMockGapAnalysis(selectedEmpId) : null);
+  const { data: apiData, isLoading } = useGapAnalysis(selectedEmpId || undefined);
+  const gapData: GapAnalysis | null = apiData || (!isLoading && selectedEmpId ? buildMockGapAnalysis(selectedEmpId) : null);
 
   const radarData = gapData?.gaps.map((g) => ({
     name: g.competency_name.length > 15 ? g.competency_name.slice(0, 15) + "…" : g.competency_name,
@@ -116,6 +117,18 @@ function GapAnalysisTab() {
           ))}
         </SelectContent>
       </Select>
+
+      {selectedEmpId && isLoading && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-24 rounded-card" />
+            ))}
+          </div>
+          <Skeleton className="h-[380px] rounded-card" />
+          <Skeleton className="h-64 rounded-card" />
+        </>
+      )}
 
       {gapData && (
         <>
@@ -200,12 +213,20 @@ function GapAnalysisTab() {
 
 // ======================== TAB 2: ROLE READINESS ========================
 function RoleReadinessTab() {
-  const { data: apiData } = useRoleReadiness();
-  const roles: RoleReadinessItem[] = apiData || MOCK_ROLE_READINESS;
+  const { data: apiData, isLoading } = useRoleReadiness();
+  const roles: RoleReadinessItem[] = apiData || (!isLoading ? MOCK_ROLE_READINESS : []);
 
   return (
     <div className="space-y-6">
       <FallbackBanner />
+      {isLoading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-44 rounded-card" />
+          ))}
+        </div>
+      )}
+      {!isLoading && (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {roles.map((r) => {
           const readinessColor =
@@ -247,6 +268,7 @@ function RoleReadinessTab() {
           );
         })}
       </div>
+      )}
     </div>
   );
 }
@@ -258,8 +280,8 @@ function TeamAnalysisTab() {
   const { data: departmentsData } = useDepartments();
   const departments = departmentsData?.map(d => d.name) ?? [];
 
-  const { data: apiData } = useTeamAnalysis(department ? { department } : {});
-  const teamData: TeamAnalysis | null = apiData || (department ? buildMockTeamAnalysis(department) : null);
+  const { data: apiData, isLoading } = useTeamAnalysis(department ? { department } : {});
+  const teamData: TeamAnalysis | null = apiData || (!isLoading && department ? buildMockTeamAnalysis(department) : null);
 
   return (
     <div className="space-y-6">
@@ -274,6 +296,17 @@ function TeamAnalysisTab() {
           ))}
         </SelectContent>
       </Select>
+
+      {department && isLoading && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-24 rounded-card" />
+            ))}
+          </div>
+          <Skeleton className="h-64 rounded-card" />
+        </>
+      )}
 
       {teamData && (
         <>
@@ -359,8 +392,22 @@ function TeamAnalysisTab() {
 
 // ======================== TAB 4: AI ORG INSIGHTS ========================
 function AiOrgInsightsTab() {
-  const { data: apiData } = useAiOrgInsights();
-  const insights: AiOrgInsightsResponse | null = apiData || buildMockAiOrgInsights();
+  const { data: apiData, isLoading } = useAiOrgInsights();
+  const insights: AiOrgInsightsResponse | null = apiData || (!isLoading ? buildMockAiOrgInsights() : null);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-40 rounded-card" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-64 rounded-card" />
+          <Skeleton className="h-64 rounded-card" />
+        </div>
+        <Skeleton className="h-80 rounded-card" />
+        <Skeleton className="h-96 rounded-card" />
+      </div>
+    );
+  }
 
   if (!insights) return null;
 

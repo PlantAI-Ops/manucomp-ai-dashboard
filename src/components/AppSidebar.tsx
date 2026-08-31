@@ -28,6 +28,7 @@ import {
   ShieldAlert,
   Settings,
   Building2,
+  Upload,
 } from "lucide-react";
 
 interface NavItem {
@@ -47,6 +48,7 @@ const navItems: NavItem[] = [
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
   { title: "AI Assistant", url: "/ai", icon: Sparkles, roles: ["admin", "manager"] },
   { title: "Audit Log", url: "/audit", icon: ShieldAlert, roles: ["admin"] },
+  { title: "Bulk Upload", url: "/bulk-upload", icon: Upload, roles: ["admin", "manager"] },
   { title: "Settings", url: "/settings", icon: Settings, roles: ["admin"] },
 ];
 
