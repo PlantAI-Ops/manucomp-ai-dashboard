@@ -4,7 +4,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { PlantAiLogo } from "@/components/PlantAiLogo";
+
 import { useAuth } from "@/hooks/useAuth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Input } from "@/components/ui/input";
@@ -67,19 +67,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <div className="flex items-center gap-2 sm:gap-3">
               <SidebarTrigger className="hidden sm:flex text-muted-foreground hover:text-foreground transition-colors" />
               <div className="flex items-center gap-2">
-                <PlantAiLogo size={24} className="sm:hidden" />
+                <img src="/comp-logo.svg" className="h-6 w-6 sm:hidden" alt="ManuComp AI" />
                 <div className="flex flex-col leading-tight">
-                  <span className="text-sm font-semibold tracking-tight text-foreground">PlantAI</span>
-                  <span className="hidden md:inline flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground border-l border-border pl-2">
-                    <span>Ops & Automation</span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-semibold text-primary">
-                      <span className="relative flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                      ManuComp AI
-                    </span>
+                  <span className="hidden md:inline text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground border-l border-border pl-2">
+                    Powered by PlantAI Ops & Automation
                   </span>
-                  <span className="sm:hidden inline-flex items-center gap-1.5 mt-0.5 text-[10px] font-medium uppercase tracking-[0.2em] text-primary">
-                    <span className="relative flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                    ManuComp AI
+                  <span className="sm:hidden mt-0.5 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    Powered by PlantAI
                   </span>
 </div>
               </div>

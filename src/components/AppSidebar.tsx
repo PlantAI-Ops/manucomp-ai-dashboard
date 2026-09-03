@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { PlantAiLogo } from "@/components/PlantAiLogo";
+
 import {
   Sidebar,
   SidebarContent,
@@ -70,18 +70,13 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
 <SidebarHeader className="p-4">
         <div className="flex items-center gap-2.5">
-          <PlantAiLogo size={28} />
           {!collapsed && (
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold tracking-tight text-sidebar-foreground">PlantAI</span>
-              <span className="text-[9px] font-medium uppercase tracking-[0.18em] text-muted-foreground mt-0.5">
-                Ops & Automation
-              </span>
-              <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-semibold text-primary">
-                <span className="relative flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                ManuComp AI
-              </span>
-            </div>
+            <>
+              <img src="/comp-logo.svg" className="h-7 w-7 shrink-0" alt="ManuComp AI" />
+              <div className="flex flex-col leading-tight">
+                <span className="text-sm font-semibold tracking-tight text-sidebar-foreground">ManuComp AI</span>
+              </div>
+            </>
           )}
         </div>
       </SidebarHeader>
