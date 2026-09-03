@@ -1,5 +1,5 @@
 import React from "react";
-import { PlantAiLogo } from "@/components/PlantAiLogo";
+
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface AuthLayoutProps {
@@ -27,18 +27,14 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 
       <div className="relative z-10 w-full max-w-md">
 <div className="mb-8 flex flex-col items-center text-center animate-fade-in">
-          <PlantAiLogo size={48} className="mb-4" />
+          <img src="/comp-logo.svg" className="h-12 w-12 mb-4" alt="ManuComp AI" />
           <div className="flex flex-col items-center gap-1">
             <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              PlantAI
+              ManuComp AI
             </h1>
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
-              Ops & Automation
+              Powered by PlantAI Ops & Automation
             </p>
-            <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold text-primary">
-              <span className="relative flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-              ManuComp AI
-            </span>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
             Industrial competency intelligence
